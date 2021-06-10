@@ -3,20 +3,11 @@ Simple client for fetching latest activity in a chat room
 """
 
 from datetime import datetime, timedelta
+from time import sleep
+import logging
 
 import requests
 from bs4 import BeautifulSoup
-
-
-def room_transcript(room: int, server: str):
-    """
-    Fetch transcript of messages from room on server
-    """
-    assert isinstance(room, int)
-    room = int(room)
-    url = "https://%s/transcript/%i" % (server, room)
-    response = requests.get(url)
-    return url, response.text
 
 
 def latest(room: int, server: str):
@@ -30,15 +21,32 @@ def latest(room: int, server: str):
     """
     assert isinstance(room, int)
     room = int(room)
-    url, transcript = room_transcript(room, server)
-    soup = BeautifulSoup(transcript, 'html.parser')
+    url = "https://%s/transcript/%i" % (server, room)
+
+    while True:
+        logging.info('Fetching %s', url)
+        print('fetching %s' % url)
+        transcript = requests.get(url).text
+        soup = BeautifulSoup(transcript, 'html.parser')
+        mono = soup.body.find_all("div", {"class": "monologue"})
+        if mono:
+            final = mono[-1]
+            break
+        else:
+            trans = soup.body.find("div", {"id": "transcript"})
+            assert trans is not None
+            assert trans.text.strip() == "no messages today"
+            main = soup.body.find("div", {"id": "main"})
+            url = 'https://%s%s' % (
+                server, main.find("a", {"rel": "prev"})['href'])
+            logging.info('No messages, falling back to %s', url)
+            print('falling back to', url)
+            sleep(1)
 
     title = soup.title.string
     assert ' - ' in title
     datestr = title.rsplit(' - ', 1)[-1]
     date = datetime.strptime(datestr, '%Y-%m-%d')
-
-    final = soup.body.find_all("div", {"class": "monologue"})[-1]
 
     when = final.find("div", {"class": "timestamp"})
     if when:
@@ -64,7 +72,9 @@ def latest(room: int, server: str):
 
 
 def main():
-    for room in (6, 291, 109494):  # python, rebol, friendly bin
+    for room in (6, 291, 109494, 228186):  # python, rebol, friendly bin, git
+        pass
+    for room in (228186,):
         info = latest(room, "chat.stackoverflow.com")
         print(info)
 
