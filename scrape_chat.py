@@ -1,36 +1,36 @@
 """
-Simple async client for fetching latest activity in a chat room
+Simple client for fetching latest activity in a chat room
 """
 
 from datetime import datetime, timedelta
-import asyncio
 
-import aiohttp
+import requests
 from bs4 import BeautifulSoup
 
 
-async def room_transcript(room: int, server: str):
+def room_transcript(room: int, server: str):
     """
     Fetch transcript of messages from room on server
     """
     assert isinstance(room, int)
     room = int(room)
     url = "https://%s/transcript/%i" % (server, room)
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            return await response.text()
+    response = requests.get(url)
+    return url, response.text
 
-async def latest(room: int, server: str):
+
+def latest(room: int, server: str):
     """
     Fetch latest message from room on server. Return a dict of
-    {'server': server, 'room': room, 'when': datetime,
+    {'server': server, 'room': room, 'url': url, 'when': datetime,
      'user': {'name': str, 'id': int}, 'msg': str, 'link': str}
     The 'msg' member is the actual message; the 'link' is its permalink.
     The 'server' and 'room' members are simply copied from the input.
+    The 'url' is the address of the transcript page we fetched and scraped.
     """
     assert isinstance(room, int)
     room = int(room)
-    transcript = await room_transcript(room, server)
+    url, transcript = room_transcript(room, server)
     soup = BeautifulSoup(transcript, 'html.parser')
 
     title = soup.title.string
@@ -45,11 +45,12 @@ async def latest(room: int, server: str):
         time = datetime.strptime(when.text, "%I:%M %p").time()
     else:
         time = datetime(1970, 1, 1).time()
-        
+
     user = final.find("div", {"class": "username"}).a['href'].split('/')
     result = {
         'server': server,
         'room': room,
+        'url': url,
         'when': datetime.combine(date, time),
         'user': {
             'name': user[-1],
@@ -60,12 +61,13 @@ async def latest(room: int, server: str):
             server, final.find("div", {"class": "message"}).a['href'])
     }
     return result
-    
-async def main():
+
+
+def main():
     for room in (6, 291, 109494):  # python, rebol, friendly bin
-        info = await latest(room, "chat.stackoverflow.com")
+        info = latest(room, "chat.stackoverflow.com")
         print(info)
 
+
 if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    main()
