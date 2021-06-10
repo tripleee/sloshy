@@ -1,0 +1,4 @@
+requests
+BeautifulSoup4
+ChatExchange
+PyYAML
