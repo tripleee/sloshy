@@ -7,6 +7,9 @@ rooms:
      id: 109494
    - name: "Git"
      id: 228186
+ - chat.meta.stackexchange.com:
+   - name: "The Friendly Café (room for testing bots on Meta.SE)"
+     id: 1543
  - chat.stackexchange.com:
    - name: "Matter Modeling: Meta"
      id: 113019
