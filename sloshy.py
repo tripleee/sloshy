@@ -130,7 +130,7 @@ class Sloshy:
             logging.info(msg)
             room['latest'] = room_latest
             if age > maxage:
-                notice(server, room)
+                self.notice(server, room)
                 chat.send_message(
                     '%s: Age threshold exceeded; sending a thawing notice' % (
                         room['name']))
