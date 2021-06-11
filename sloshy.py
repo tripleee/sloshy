@@ -84,6 +84,7 @@ class Sloshy:
         """
         Establish a chat client connected to room on server
         """
+        assert isinstance(room, int)
         if server not in self.chatclient:
             assert server.startswith('chat.')
             site = server[5:]
@@ -130,7 +131,7 @@ class Sloshy:
             logging.info(msg)
             room['latest'] = room_latest
             if age > maxage:
-                self.notice(server, room)
+                self.notice(server, room['id'])
                 chat.send_message(
                     '%s: Age threshold exceeded; sending a thawing notice' % (
                         room['name']))
