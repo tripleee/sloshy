@@ -7,6 +7,9 @@ rooms:
      id: 109494
    - name: "Git"
      id: 228186
+ - chat.meta.stackexchange.com:
+   - name: "The Friendly Café (room for testing bots on Meta.SE)"
+     id: 1543
  - chat.stackexchange.com:
    - name: "Matter Modeling: Meta"
      id: 113019
@@ -54,16 +57,5 @@ rooms:
      id: 107323
    - name: "Matter Modeling: Q-Chem software"
      id: 109797
-   - name: "Matter Modeling: Q-Chem software"
-     id: 109797
    - name: "Area 51: Matter Modeling Proposal"
-     id: 104555 
-     
-     
-
-     
-    
-     
- 
- 
- 
+     id: 104555
