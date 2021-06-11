@@ -35,6 +35,13 @@ Perhaps notice that there are two chat servers
 with very similar names,
 where one contains "overflow" and the other contains "exchange".)
 
+The `name` key is not important,
+it just determines what Sloshy displays
+in its status message
+when it visits the room.
+Only the server name and the `id` matters
+for actually identifying the room.
+
 
 ## Deploy
 
