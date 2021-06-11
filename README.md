@@ -18,6 +18,17 @@ for Sloshy to report his activities into;
 please don't touch that).
 
 
+## Deploy
+
+There is a simple Github Action which runs nightly.
+
+
+## Bot Profiles
+
+* [Main profile](https://stackoverflow.com/users/16115299/sloshy)
+* [Chat profile](https://chat.stackoverflow.com/users/16115299/sloshy)
+
+
 ## Author
 
 tripleee
