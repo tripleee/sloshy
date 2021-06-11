@@ -1,0 +1,24 @@
+name: Nightly
+
+# Controls when the action will run. 
+on:
+  schedule:
+    - cron: '17 1 * * *'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  nightly:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: run.py
+        env:
+          SLOSHY_EMAIL: ${{secrets.SLOSHY_EMAIL}}
+          SLOSHY_PASSWORD: ${{secrets.SLOSHY_PASSWORD}}
+        run: |
+          pip3 install -r requirements.txt
+          python3 ./run.py
