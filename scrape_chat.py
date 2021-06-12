@@ -73,8 +73,6 @@ def latest(room: int, server: str):
 
 def main():
     for room in (6, 291, 109494, 228186):  # python, rebol, friendly bin, git
-        pass
-    for room in (228186,):
         info = latest(room, "chat.stackoverflow.com")
         print(info)
 
