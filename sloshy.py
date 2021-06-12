@@ -11,7 +11,7 @@ import logging
 import yaml
 import chatexchange.client
 
-from scrape_chat import latest
+from scrape_chat import Transcript
 
 
 class Sloshy:
@@ -119,10 +119,11 @@ class Sloshy:
         # just to be on the safe side.
         maxage = timedelta(days=12)
 
+        fetcher = Transcript()
         for server, room in self.traverse_rooms():
             if 'role' in room and room['role'] == 'home':
                 continue
-            room_latest = latest(room['id'], server)
+            room_latest = fetcher.latest(room['id'], server)
             when = room_latest['when']
             age = now-when
             msg = '%s (%s): %s (%s)' % (
