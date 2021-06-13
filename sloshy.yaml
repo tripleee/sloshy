@@ -57,7 +57,5 @@ rooms:
      id: 107323
    - name: "Matter Modeling: Q-Chem software"
      id: 109797
-   - name: "Matter Modeling: Q-Chem software"
-     id: 109797
    - name: "Area 51: Matter Modeling Proposal"
      id: 104555
