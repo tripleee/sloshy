@@ -161,10 +161,20 @@ class Sloshy:
 
         for item in self.config['rooms']:
             for server, rooms in item.items():
+                if server in self.chatclients.servers:
+                    logging.warning(
+                        'Duplicate server %s in %s', server, conffile)
+                seen = set()
                 for idx in range(len(item[server])):
                     room = item[server][idx]
                     assert 'id' in room
                     assert 'name' in room
+                    if room['id'] in seen:
+                        logging.warning(
+                            'Skipping duplicate room %s:%s (%s) in %s',
+                            server, room['id'], room['name'], conffile)
+                        continue
+                    seen.add(room['id'])
                     roomobj = Room(server, room['id'], room['name'], clients)
                     self.rooms.append(roomobj)
                     if 'role' in room and room['role'] == 'home':
