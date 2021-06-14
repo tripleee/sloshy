@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from os import environ
 import random
 from time import sleep
+import platform
 import logging
 
 import yaml
@@ -148,14 +149,14 @@ class Sloshy:
             config = yaml.safe_load(filehandle)
         assert 'rooms' in config
 
-        self.config = config['rooms']
+        self.config = config
         self.rooms = []
         self.homeroom = None
 
         clients = Chatclients(local=self.local)
         self.chatclients = clients
 
-        for item in self.config:
+        for item in self.config['rooms']:
             for server, rooms in item.items():
                 for idx in range(len(item[server])):
                     room = item[server][idx]
@@ -174,6 +175,18 @@ class Sloshy:
             self.password = config['auth']['password']
             # Gripe a bit, we don't want users to embed authnz in the file
             logging.warning('Chat username and password read from config')
+
+    def nodename(self):
+        """
+        Produce a string which identifies where Sloshy is running,
+        for the startup message in the monitoring room.
+
+        If the configuration file contains a node name, use that;
+        otherwise, return platform.node()
+        """
+        if 'nodename' not in self.config:
+            self.config['nodename'] = platform.node()
+        return self.config['nodename']
 
     def generate_chat_message(self):
         """
@@ -201,11 +214,14 @@ class Sloshy:
         """
         self.send_chat_message(room, self.generate_chat_message())
 
-    def scan_rooms(self):
+    def scan_rooms(self, startup_message="manual run"):
         """
         Main entry point for scanning: Visit room transcripts,
         check if they are in danger of being frozen; if so, join
         and post a message.
+
+        The startup_message is included in the notification in the
+        monitoring room when Sloshy starts up.
         """
         now = datetime.now()
         # Freeze schedule is 14 days; thaw a little before that,
@@ -214,6 +230,11 @@ class Sloshy:
 
         fetcher = Transcript()
         homeroom = self.homeroom
+        self.send_chat_message(
+            homeroom, '[Sloshy](%s) %s on %s' % (
+                'https://github.com/tripleee/sloshy',
+                startup_message,
+                self.nodename()))
         for room in self.rooms:
             if room.is_home_room():
                 continue
@@ -234,7 +255,7 @@ class Sloshy:
 
 def main():
     logging.basicConfig(level=logging.INFO)
-    Sloshy("sloshy.yaml", local=True).scan_rooms()
+    Sloshy("test.yaml", local=True).scan_rooms()
 
 
 if __name__ == '__main__':
