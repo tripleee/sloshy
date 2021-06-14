@@ -1,7 +1,7 @@
 rooms:
  - chat.stackoverflow.com:
-   - name: "Sloshy"
-     id: 233626
+   - name: "SOBotics"
+     id: 111347
      role: home
    - name: "friendly bin"
      id: 109494
