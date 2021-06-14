@@ -258,7 +258,7 @@ class Sloshy:
 
 def main():
     logging.basicConfig(level=logging.INFO)
-    Sloshy("test.yaml", local=True).scan_rooms()
+    Sloshy("test.yaml").scan_rooms()
 
 
 if __name__ == '__main__':
