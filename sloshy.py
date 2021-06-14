@@ -153,6 +153,9 @@ class Sloshy:
         self.rooms = []
         self.homeroom = None
 
+        if not self.local and 'local' in config:
+            self.local = bool(config['local'])
+
         clients = Chatclients(local=self.local)
         self.chatclients = clients
 
