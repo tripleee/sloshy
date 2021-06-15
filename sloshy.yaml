@@ -9,3 +9,55 @@ rooms:
      id: 228186
    - name: "Sloshy the Thawman"
      id: 233626
+ - chat.meta.stackexchange.com:
+   - name: "The Friendly Café (room for testing bots on Meta.SE)"
+     id: 1543
+ - chat.stackexchange.com:
+   - name: "Matter Modeling: Meta"
+     id: 113019
+   - name: "Matter Modeling: Phonopy software"
+     id: 112358
+   - name: "Matter Modeling: LAMMPS software"
+     id: 109805
+   - name: "Matter Modeling: GROMACS software"
+     id: 120383
+   - name: "Matter Modeling: GPAW software"
+     id: 112878
+   - name: "Matter Modeling: Quantum ESPRESSO software"
+     id: 117642
+   - name: "Matter Modeling: VASP software"
+     id: 109983
+   - name: "Matter Modeling: HPQC (High Performance & Quantum Computing)"
+     id: 117114
+   - name: "Matter Modeling: Mathematics & Science related to Matter Modeling"
+     id: 119831
+   - name: "Matter Modeling: Protein folding, docking, and biomatter modeling"
+     id: 113915
+   - name: "Matter Modeling: GAUSSIAN software"
+     id: 110569
+   - name: "Matter Modeling: ASE software"
+     id: 111469
+   - name: "Matter Modeling: Spectroscopy & Potentiology"
+     id: 117652
+   - name: "Matter Modeling: Physical Properties of Materials"
+     id: 110288
+   - name: "Matter Modeling: MOLPRO software"
+     id: 112274
+   - name: "Matter Modeling: Testing Feeds"
+     id: 108277
+   - name: "Matter Modeling: HNQ"
+     id: 109935
+   - name: "Matter Modeling: Bounties"
+     id: 109905
+   - name: "Matter Modeling: Questions related to Matter Modeling, but posted in other places (e.g. other SE sites, or Reddit)"
+     id: 110113
+   - name: "Matter Modeling: Ask a Moderator"
+     id: 110431
+   - name: "Matter Modeling: Announcements of user or site milestones achieved"
+     id: 109902
+   - name: "Matter Modeling: General chat room"
+     id: 107323
+   - name: "Matter Modeling: Q-Chem software"
+     id: 109797
+   - name: "Area 51: Matter Modeling Proposal"
+     id: 104555
