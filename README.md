@@ -18,16 +18,18 @@ There is no interactive interface to the bot;
 create a pull request if you would like to add a room
 to Sloshy's watch list.
 
-In the YAML configuration file, add the server if it is missing
-(though that's unlikely)
-and add information about the room you want to add;
+In the YAML configuration file, add the server's name
+to the `rooms` key if it is missing (though that's unlikely)
+and create a new entry with information about the room you want to add;
 
 * The `id` is the room's numeric identifier.
-  This (together with the server) is the way Sloshy finds the room.
+  This (together with the server's name) is the way Sloshy finds the room.
 * The `name` field is just a display string for Sloshy's status messages.
   It can be anything, but should describe the room
   reasonably unambiguously to humans.
-* The `contact` field indicates who requested the room to be added.
+* The `contact` field indicates who requested the room to be added,
+  in case we would need to touch base with you later on
+  to assess whether the room still needs to be on the list, etc.
   The format should be your user name,
   followed by the network account id in round parentheses.
   The network id number can be found by clicking "Network profile"
