@@ -32,4 +32,4 @@ jobs:
         SLOSHY_EMAIL: ${{secrets.SLOSHY_EMAIL}}
         SLOSHY_PASSWORD: ${{secrets.SLOSHY_PASSWORD}}
       run:
-        python sloshy.py test-pushed.yaml "PR test"
+        python sloshy.py test-pushed.yaml "Github Actions: Push test"
