@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 Sloshy the Thawman - main class
 """
@@ -227,7 +229,7 @@ class Sloshy:
         """
         self.send_chat_message(room, self.generate_chat_message())
 
-    def scan_rooms(self, startup_message="manual run"):
+    def scan_rooms(self, startup_message=None):
         """
         Main entry point for scanning: Visit room transcripts,
         check if they are in danger of being frozen; if so, join
@@ -235,7 +237,11 @@ class Sloshy:
 
         The startup_message is included in the notification in the
         monitoring room when Sloshy starts up.
+        If it is missing or None, it defaults to "manual run".
         """
+        if not startup_message:
+            startup_message = "manual run"
+
         now = datetime.now()
         # Freeze schedule is 14 days; thaw a little before that,
         # just to be on the safe side.
@@ -267,8 +273,10 @@ class Sloshy:
 
 
 def main():
+    from sys import argv
     logging.basicConfig(level=logging.INFO)
-    Sloshy("test.yaml").scan_rooms()
+    Sloshy(argv[1] if len(argv) > 1 else "test.yaml").scan_rooms(
+        argv[2] if len(argv) > 2 else None)
 
 
 if __name__ == '__main__':
