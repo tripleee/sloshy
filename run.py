@@ -7,6 +7,8 @@ Wake up, check if there are any rooms have no recent activity,
 post a brief message in those to keep them from freezing
 """
 
+import os
+
 from sloshy import Sloshy
 
 
