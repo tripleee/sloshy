@@ -268,6 +268,8 @@ class Sloshy:
             room_latest = fetcher.latest(room.id, room.server)
             when = room_latest['when']
             age = now-when
+            # Trim microseconds
+            age = age - timedelta(microseconds=age.microseconds)
             msg = '[%s](%s): latest activity %s (%s ago)' % (
                 room.name, room_latest['url'], when, age)
             self.send_chat_message(homeroom, msg)
