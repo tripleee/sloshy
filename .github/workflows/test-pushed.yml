@@ -28,5 +28,8 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 --count --exit-zero --max-complexity=10 --statistics *.py
     - name: Simple posting test
+      env:
+        SLOSHY_EMAIL: ${{secrets.SLOSHY_EMAIL}}
+        SLOSHY_PASSWORD: ${{secrets.SLOSHY_PASSWORD}}
       run:
-        python sloshy.py test-pushed.yaml
+        python sloshy.py test-pushed.yaml "PR test"
