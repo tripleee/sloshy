@@ -243,9 +243,17 @@ class Sloshy:
             startup_message = "manual run"
 
         now = datetime.now()
-        # Freeze schedule is 14 days; thaw a little before that,
+
+        # Default freeze schedule is 14 days; thaw a little before that,
         # just to be on the safe side.
-        maxage = timedelta(days=12)
+        if 'threshold' in self.config:
+            if isinstance(self.config['threshold'], str):
+                maxage = timedelta(*tuple(int(x.strip())
+                    for x in self.config['threshold'].split(",")))
+            else:
+                maxage = timedelta(self.config['threshold'])
+        else:
+            maxage = timedelta(days=12)
 
         fetcher = Transcript()
         homeroom = self.homeroom
@@ -255,7 +263,7 @@ class Sloshy:
                 startup_message,
                 self.nodename()))
         for room in self.rooms:
-            if room.is_home_room():
+            if room.is_home_room() and 'scan_homeroom' not in self.config:
                 continue
             room_latest = fetcher.latest(room.id, room.server)
             when = room_latest['when']
