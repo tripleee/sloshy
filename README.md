@@ -11,36 +11,43 @@ to leave some leeway for possible accidents
 There is no interactive interface to the bot;
 create a pull request if you would like to add a room
 to Sloshy's watch list.
-The YAML configuration file should hopefully be
-reasonably self-explanatory
-(save perhaps for the "home" role, which selects a room
-for Sloshy to report his activities into;
-please don't touch that).
+
+In the YAML configuration file, add the server if it is missing
+(though that's unlikely)
+and add information about the room you want to addd;
+
+* The `id` is the room's numeric identifier.
+  This (together with the server) is the way Sloshy finds the room.
+* The `name` field is just a display string for Sloshy's status messages.
+  It can be anything, but should describe the room
+  reasonably unambiguously to humans.
+* The `contact` field indicates who requested the room to be added.
+  The format should be your user name,
+  followed by the network account id in round parentheses.
+  The network id number can be found by clicking "Network profile"
+  on any profile page for your account.
+  (For example, Sloshy is user 16115299 on Stack Overflow,
+  but network user 21818820.)
 
 In brief, if your chatroom's URL is
 https://chat.stackexchange.com/rooms/12345/my-room,
-you would have
+and your network account ID is 21818820, you would add
 ```
 rooms:
  - chat.stackexchange.com:
    - name: "my room's name"
      id: 12345
+     contact: Sloshy the Thawman (21818820)
 ```
 in the configuration file.
 (This is showing the complete YAML structure;
-the `rooms` top-level key obviously already exists,
-and it is likely that `chat.stackexchange.com`
-will be added if it is not already there by the time you read this.
-Perhaps notice that there are two chat servers
-with very similar names,
-where one contains "overflow" and the other contains "exchange".)
+the `rooms` top-level key
+and the server `chat.stackexchange.com` obviously already exist
+in the file.)
 
-The `name` key is not important,
-it just determines what Sloshy displays
-in its status message
-when it visits the room.
-Only the server name and the `id` matters
-for actually identifying the room.
+Perhaps notice also that there are two main chat servers
+with very similar names,
+where one contains "overflow" and the other contains "exchange".
 
 
 ## Deploy
