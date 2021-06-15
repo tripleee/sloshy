@@ -1,0 +1,9 @@
+rooms:
+ - chat.stackoverflow.com:
+   - name: "Sloshy"
+     id: 233626
+     role: home
+     contact: tripleee (468289)
+disclaimer: these keys are undocumented (or just don't do anything :-)
+scan_homeroom: true
+threshold: 0
