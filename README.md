@@ -49,6 +49,21 @@ Perhaps notice also that there are two main chat servers
 with very similar names,
 where one contains "overflow" and the other contains "exchange".
 
+Besides `rooms`, there are some other configuration options
+which can be specified in the YAML file.
+For the most part, these are undocuemented options
+for use in internal testing,
+but the following are expected to remain stable and supported:
+
+* `local`: boolean; set to `true` to disable connecting to chat.
+  Sloshy will still need to open network connections
+  to fetch chat transcripts, but will not emit any chat messages.
+* `nodename`: string; set to the name you would like to display
+  as Sloshy's location in the startup message.
+* `threshold`: expression indicating after how much inactivity
+  to emit an anti-freeze message to a room.
+  The default is 12 days; set to a different number to override.
+  (See the source for advanced and possibly unstable options.)
 
 ## Deploy
 
