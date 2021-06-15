@@ -248,7 +248,8 @@ class Sloshy:
         # just to be on the safe side.
         if 'threshold' in self.config:
             if isinstance(self.config['threshold'], str):
-                maxage = timedelta(*tuple(int(x.strip())
+                maxage = timedelta(*tuple(
+                    int(x.strip())
                     for x in self.config['threshold'].split(",")))
             else:
                 maxage = timedelta(self.config['threshold'])
