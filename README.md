@@ -1,5 +1,11 @@
 # Sloshy the Thawman
 
+
+![Build status badge][1]
+
+  [1]: https://github.com/tripleee/sloshy/actions/workflows/test-pushed.yml/badge.svg
+
+
 This is a simple Stack Overflow / Stack Exchange chat bot
 which keeps an eye on a selected list of rooms,
 and makes sure they are not frozen.
