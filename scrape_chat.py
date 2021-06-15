@@ -2,7 +2,7 @@
 Simple client for fetching latest activity in a chat room
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from time import sleep
 import platform
 import logging
@@ -20,14 +20,19 @@ class Transcript:
         platform.python_version(),
         requests.__version__)
 
-    def fetch(self, url: str, fallback_sleep: int = 1) -> BeautifulSoup:
+    def fetch(
+            self, server: str, room: int,
+            fallback_sleep: int = 1
+    ) -> BeautifulSoup:
         """
-        Retrieve URL and return the .text component as a BeautifulSoup object.
+        Retrieve room transcript from server and return the .text component
+        as a BeautifulSoup object, and the URL it was fetched from.
         Send the User-Agent: header of this client.
 
         If the current transcript is empty, optionally sleep before fetching
         an older page; the fallback_sleep integer argument controls this.
         """
+        url = "https://%s/transcript/%i" % (server, room)
         while True:
             logging.info('Fetching %s', url)
             transcript = requests.get(
@@ -44,7 +49,7 @@ class Transcript:
                     server, main.find("a", {"rel": "prev"})['href'])
                 logging.info('No messages, falling back to %s', url)
                 sleep(fallback_sleep)
-        return soup
+        return soup, url
 
     def latest(self, room: int, server: str) -> dict:
         """
@@ -57,8 +62,7 @@ class Transcript:
         """
         assert isinstance(room, int)
         room = int(room)
-        url = "https://%s/transcript/%i" % (server, room)
-        soup = self.fetch(url)
+        soup, url = self.fetch(server, room)
 
         title = soup.title.string
         assert ' - ' in title
