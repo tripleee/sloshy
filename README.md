@@ -14,7 +14,7 @@ to Sloshy's watch list.
 
 In the YAML configuration file, add the server if it is missing
 (though that's unlikely)
-and add information about the room you want to addd;
+and add information about the room you want to add;
 
 * The `id` is the room's numeric identifier.
   This (together with the server) is the way Sloshy finds the room.
