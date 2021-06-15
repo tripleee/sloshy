@@ -7,12 +7,12 @@ Wake up, check if there are any rooms have no recent activity,
 post a brief message in those to keep them from freezing
 """
 
+import os
+
 from sloshy import Sloshy
 
 
-def main():
-    Sloshy("sloshy.yaml").scan_rooms()
-
-
 if __name__ == '__main__':
-    main()
+    assert 'SLOSHY_EMAIL' in os.environ
+    assert 'SLOSHY_PASSWORD' in os.environ
+    Sloshy("sloshy.yaml").scan_rooms("nightly run")

@@ -17,6 +17,31 @@ reasonably self-explanatory
 for Sloshy to report his activities into;
 please don't touch that).
 
+In brief, if your chatroom's URL is
+https://chat.stackexchange.com/rooms/12345/my-room,
+you would have
+```
+rooms:
+ - chat.stackexchange.com:
+   - name: "my room's name"
+     id: 12345
+```
+in the configuration file.
+(This is showing the complete YAML structure;
+the `rooms` top-level key obviously already exists,
+and it is likely that `chat.stackexchange.com`
+will be added if it is not already there by the time you read this.
+Perhaps notice that there are two chat servers
+with very similar names,
+where one contains "overflow" and the other contains "exchange".)
+
+The `name` key is not important,
+it just determines what Sloshy displays
+in its status message
+when it visits the room.
+Only the server name and the `id` matters
+for actually identifying the room.
+
 
 ## Deploy
 

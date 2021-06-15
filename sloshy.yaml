@@ -1,12 +1,14 @@
 rooms:
  - chat.stackoverflow.com:
-   - name: "Sloshy"
-     id: 233626
+   - name: "SOBotics"
+     id: 111347
      role: home
    - name: "friendly bin"
      id: 109494
    - name: "Git"
      id: 228186
+   - name: "Sloshy the Thawman"
+     id: 233626
  - chat.meta.stackexchange.com:
    - name: "The Friendly Café (room for testing bots on Meta.SE)"
      id: 1543
