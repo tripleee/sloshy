@@ -258,7 +258,7 @@ class Sloshy:
         fetcher = Transcript()
         homeroom = self.homeroom
         self.send_chat_message(
-            homeroom, '[Sloshy](%s) %s on %s' % (
+            homeroom, '[Sloshy](%s) startup: %s on %s' % (
                 'https://github.com/tripleee/sloshy',
                 startup_message,
                 self.nodename()))
@@ -270,7 +270,7 @@ class Sloshy:
             age = now-when
             # Trim microseconds
             age = age - timedelta(microseconds=age.microseconds)
-            msg = '[%s](%s): latest activity %s (%s ago)' % (
+            msg = '[%s](%s): latest activity %s (%s hours ago)' % (
                 room.name, room_latest['url'], when, age)
             self.send_chat_message(homeroom, msg)
             logging.info(msg)
