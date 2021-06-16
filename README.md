@@ -14,6 +14,8 @@ The threshold is currently set to 12 days since the previous message,
 to leave some leeway for possible accidents
 (the freeze happens after 14 days of inactivity).
 
+## Configuration
+
 There is no interactive interface to the bot;
 create a pull request if you would like to add a room
 to Sloshy's watch list.
@@ -59,7 +61,7 @@ where one contains "overflow" and the other contains "exchange".
 
 Besides `rooms`, there are some other configuration options
 which can be specified in the YAML file.
-For the most part, these are undocuemented options
+For the most part, these are undocumented options
 for use in internal testing,
 but the following are expected to remain stable and supported:
 
@@ -86,4 +88,4 @@ There is a simple Github Action which runs nightly.
 
 ## Author
 
-tripleee
+[tripleee](https://stackoverflow.com/users/874188/tripleee)
