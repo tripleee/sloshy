@@ -41,13 +41,13 @@ and create a new entry with information about the room you want to add;
 
 In brief, if your chatroom's URL is
 https://chat.stackexchange.com/rooms/12345/my-room,
-and your network account ID is 21818820, you would add
+and your network account ID is 123456789, you would add
 ```
 rooms:
  - chat.stackexchange.com:
    - name: "my room's name"
      id: 12345
-     contact: Sloshy the Thawman (21818820)
+     contact: your name (123456789)
 ```
 in the configuration file.
 (This is showing the complete YAML structure;
