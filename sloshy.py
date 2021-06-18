@@ -12,7 +12,7 @@ import platform
 import logging
 
 import yaml
-import chatexchange.client
+from chatexchange.client import Client as ChExClient, ChatActionError
 
 from scrape_chat import Transcript
 
@@ -66,7 +66,7 @@ class Chatclients:
         self.email = email
         self.password = password
 
-    def get_client_for_server(self, server: str) -> chatexchange.client.Client:
+    def get_client_for_server(self, server: str) -> ChExClient:
         assert self.email is not None
         assert self.password is not None
 
@@ -76,7 +76,7 @@ class Chatclients:
             if self.local:
                 client = LocalClient(site)
             else:
-                client = chatexchange.client.Client(site)
+                client = ChExClient(site)
             client.login(self.email, self.password)
             self.servers[server] = client
         return self.servers[server]
@@ -276,12 +276,15 @@ class Sloshy:
             self.send_chat_message(homeroom, msg)
             logging.info(msg)
             if age > maxage:
-                self.notice(room)
-                self.send_chat_message(
-                    homeroom,
-                    '%s: Age threshold exceeded; sending a thawing notice' % (
-                        room.name))
-
+                try:
+                    self.notice(room)
+                    self.send_chat_message(
+                        homeroom, '%s: Age threshold exceeded;'
+                        ' sending a thawing notice' % room.name)
+                except ChatActionError as err:
+                    self.send_chat_message(
+                        homeroom, '%s: Age threshold exceeded,'
+                        ' but failed to thaw: %s' % err )
 
 def main():
     from sys import argv
