@@ -23,14 +23,16 @@ class Transcript:
     def fetch(
             self, server: str, room: int,
             fallback_sleep: int = 1
-    ) -> BeautifulSoup:
+    ) -> tuple:  # TODO: better typing?
         """
-        Retrieve room transcript from server and return the .text component
-        as a BeautifulSoup object, and the URL it was fetched from.
-        Send the User-Agent: header of this client.
+        Generator to retrieve increasingly old room transcripts from server
+        and extract the .text component as a BeautifulSoup object, and the
+        URL it was fetched from.
 
-        If the current transcript is empty, optionally sleep before fetching
-        an older page; the fallback_sleep integer argument controls this.
+        On each fetch, send the User-Agent: header of this client.
+
+        Optionally sleep before fetching an older page; the fallback_sleep
+        integer argument controls this.
         """
         url = "https://%s/transcript/%i" % (server, room)
         while True:
@@ -38,18 +40,55 @@ class Transcript:
             transcript = requests.get(
                 url, headers={'User-Agent': __class__.UA}).text
             soup = BeautifulSoup(transcript, 'html.parser')
-            if soup.body.find_all("div", {"class": "monologue"}):
-                break
-            else:
-                trans = soup.body.find("div", {"id": "transcript"})
-                assert trans is not None
-                assert trans.text.strip() == "no messages today"
-                main = soup.body.find("div", {"id": "main"})
-                url = 'https://%s%s' % (
-                    server, main.find("a", {"rel": "prev"})['href'])
-                logging.info('No messages, falling back to %s', url)
-                sleep(fallback_sleep)
-        return soup, url
+
+            yield soup, url
+
+            trans = soup.body.find("div", {"id": "transcript"})
+            assert trans is not None
+            # assert trans.text.strip() == "no messages today"
+            main = soup.body.find("div", {"id": "main"})
+            url = 'https://%s%s' % (
+                server, main.find("a", {"rel": "prev"})['href'])
+            logging.info('No messages, falling back to %s', url)
+            sleep(fallback_sleep)
+
+    def messages(self, server: str, room: int) -> dict:
+        """
+        Generator to retrieve increasingly old messages from the room's
+        transcript.
+
+        Yield a dict with a representation of the extracted message.
+        """
+        for soup, url in self.fetch(server, room):
+            title = soup.title.string
+            assert ' - ' in title
+            datestr = title.rsplit(' - ', 1)[-1]
+            date = datetime.strptime(datestr, '%Y-%m-%d')
+
+            monologue = soup.body.find_all("div", {"class": "monologue"})
+            for message in reversed(monologue):
+                when = message.find("div", {"class": "timestamp"})
+                if when:
+                    time = datetime.strptime(when.text, "%I:%M %p").time()
+                else:
+                    time = datetime(1970, 1, 1).time()
+
+                user = message.find(
+                    "div", {"class": "username"}).a['href'].split('/')
+
+                yield {
+                    'server': server,
+                    'room': room,
+                    'url': url,
+                    'when': datetime.combine(date, time),
+                    'user': {
+                        'name': user[-1],
+                        'id': int(user[-2])
+                        },
+                    'msg': message.find(
+                        "div", {"class": "content"}).text.strip(),
+                    'link': url
+                }
 
     def latest(self, room: int, server: str) -> dict:
         """
@@ -62,42 +101,20 @@ class Transcript:
         """
         assert isinstance(room, int)
         room = int(room)
-        soup, url = self.fetch(server, room)
 
-        title = soup.title.string
-        assert ' - ' in title
-        datestr = title.rsplit(' - ', 1)[-1]
-        date = datetime.strptime(datestr, '%Y-%m-%d')
-
-        # TODO maybe return this from fetch() too?
-        final = soup.body.find_all("div", {"class": "monologue"})[-1]
-        when = final.find("div", {"class": "timestamp"})
-        if when:
-            time = datetime.strptime(when.text, "%I:%M %p").time()
-        else:
-            time = datetime(1970, 1, 1).time()
-
-        user = final.find("div", {"class": "username"}).a['href'].split('/')
-        result = {
-            'server': server,
-            'room': room,
-            'url': url,
-            'when': datetime.combine(date, time),
-            'user': {
-                'name': user[-1],
-                'id': int(user[-2])
-                },
-            'msg': final.find("div", {"class": "content"}).text.strip(),
-            'link': '//%s%s' % (
-                server, final.find("div", {"class": "message"}).a['href'])
-        }
-        return result
+        for message in self.messages(server, room):
+            if message['user']['id'] == -2:
+                continue
+            return message
 
 
 def main():
     fetcher = Transcript()
     for room in (6, 291, 109494, 228186):  # python, rebol, friendly bin, git
         info = fetcher.latest(room, "chat.stackoverflow.com")
+        print(info)
+    for room in (109983, 117114):
+        info = fetcher.latest(room, "chat.stackexchange.com")
         print(info)
 
 
