@@ -46,6 +46,9 @@ class LocalClient:
             'local - %s/rooms/%i: not sending message', self.host, self.room)
         print(message)
 
+    def logout(self):
+        logging.info('local - %s/rooms/%i: loggoug out', self.host, self.room)
+
 
 class Chatclients:
     """
@@ -80,6 +83,15 @@ class Chatclients:
             client.login(self.email, self.password)
             self.servers[server] = client
         return self.servers[server]
+
+    def logout(self):
+        """
+        Log out from all the chat clients.
+        """
+        for server, client in self.servers.items():
+            logging.info("Logging out from %s", server)
+            client.logout()
+        self.servers = dict()
 
 
 class Room:
@@ -286,10 +298,18 @@ class Sloshy:
                         homeroom, '%s: Age threshold exceeded,'
                         ' but failed to thaw: %s' % err )
 
+    def perform_scan(self, startup_message=None):
+        """
+        Entry point for a single scan: Perform scan_rooms, then logout().
+        """
+        self.scan_rooms(startup_message)
+        self.chatclients.logout()
+
+
 def main():
     from sys import argv
     logging.basicConfig(level=logging.INFO)
-    Sloshy(argv[1] if len(argv) > 1 else "test.yaml").scan_rooms(
+    Sloshy(argv[1] if len(argv) > 1 else "test.yaml").perform_scan(
         argv[2] if len(argv) > 2 else None)
 
 
