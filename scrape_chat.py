@@ -98,12 +98,15 @@ class Transcript:
         The 'msg' member is the actual message; the 'link' is its permalink.
         The 'server' and 'room' members are simply copied from the input.
         The 'url' is the address of the transcript page we fetched and scraped.
+
+        Skip any negative user id:s, as those are feed messages which do
+        not count as actual activity.
         """
         assert isinstance(room, int)
         room = int(room)
 
         for message in self.messages(server, room):
-            if message['user']['id'] == -2:
+            if message['user']['id'] < 0:
                 continue
             return message
 
