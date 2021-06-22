@@ -296,7 +296,7 @@ class Sloshy:
                 except ChatActionError as err:
                     self.send_chat_message(
                         homeroom, '%s: Age threshold exceeded,'
-                        ' but failed to thaw: %s' % err )
+                        ' but failed to thaw: %s' % err)
 
     def perform_scan(self, startup_message=None):
         """
