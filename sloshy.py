@@ -47,7 +47,7 @@ class LocalClient:
         print(message)
 
     def logout(self):
-        logging.info('local - %s/rooms/%i: loggoug out', self.host, self.room)
+        logging.info('local - %s/rooms/%i: logging out', self.host, self.room)
 
 
 class Chatclients:
@@ -91,6 +91,12 @@ class Chatclients:
         for server, client in self.servers.items():
             logging.info("Logging out from %s", server)
             client.logout()
+            queue = client._request_queue
+            while not queue.empty():
+                logging.info(
+                    "Waiting for %s queue to drain (%i items in queue)",
+                    server, queue.qsize())
+                sleep(15)
         self.servers = dict()
 
 
