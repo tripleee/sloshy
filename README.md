@@ -55,6 +55,9 @@ the `rooms` top-level key
 and the server `chat.stackexchange.com` obviously already exist
 in the file.)
 
+Please separately make sure that Sloshy has write access to
+any privileged room you want to add to the list.
+
 Perhaps notice also that there are two main chat servers
 with very similar names,
 where one contains "overflow" and the other contains "exchange".
