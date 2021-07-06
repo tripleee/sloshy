@@ -13,6 +13,9 @@ rooms:
    - name: "Sloshy the Thawman"
      id: 233626
      contact: tripleee (468289)
+   - name: "Duck Overflow"
+     id: 193903
+     contact: samcarter (3270911)
  - chat.meta.stackexchange.com:
    - name: "The Friendly Café (room for testing bots on Meta.SE)"
      id: 1543
