@@ -16,6 +16,9 @@ rooms:
    - name: "Duck Overflow"
      id: 193903
      contact: samcarter (3270911)
+   - name: "shree's room"
+     id: 232981
+     contact: Shree (965146)
  - chat.meta.stackexchange.com:
    - name: "The Friendly Café (room for testing bots on Meta.SE)"
      id: 1543
