@@ -17,6 +17,12 @@ from chatexchange.client import Client as ChExClient, ChatActionError
 from scrape_chat import Transcript
 
 
+class LocalClientRequestQueue:
+    "Quick hack to support logout() method"
+    def empty(self):
+        return True
+
+
 class LocalClient:
     """
     Simple mock ChatExchange.client with no actual networking functionality
@@ -27,6 +33,8 @@ class LocalClient:
         self.password = password
 
         self.room = None
+
+        self._request_queue = LocalClientRequestQueue()
 
     def login(self, email=None, password=None):
         logging.info('local - not logging in to %s', self.host)
