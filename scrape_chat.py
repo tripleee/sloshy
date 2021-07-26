@@ -75,8 +75,22 @@ class Transcript:
                 else:
                     time = datetime(1970, 1, 1).time()
 
-                user = message.find(
-                    "div", {"class": "username"}).a['href'].split('/')
+                userdiv = message.find("div", {"class": "username"})
+                try:
+                    # <div class="username">
+                    # <a href="/users/3735529/smokedetector"
+                    #    title="SmokeDetector">SmokeDetector</a></div>
+                    user = userdiv.a['href'].split('/')
+                    username = user[-1]
+                    userid = int(user[-2])
+                except TypeError:
+                    # <div class="username">user12716323</div>
+                    username = userdiv.text
+                    if username.startswith('user'):
+                        try:
+                            userid = int(username[4:])
+                        except ValueError:
+                            userid = 0
 
                 yield {
                     'server': server,
@@ -84,8 +98,8 @@ class Transcript:
                     'url': url,
                     'when': datetime.combine(date, time),
                     'user': {
-                        'name': user[-1],
-                        'id': int(user[-2])
+                        'name': username,
+                        'id': userid
                         },
                     'msg': message.find(
                         "div", {"class": "content"}).text.strip(),
