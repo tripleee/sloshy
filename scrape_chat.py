@@ -47,8 +47,10 @@ class Transcript:
             assert trans is not None
             # assert trans.text.strip() == "no messages today"
             main = soup.body.find("div", {"id": "main"})
-            url = 'https://%s%s' % (
-                server, main.find("a", {"rel": "prev"})['href'])
+            prev = main.find("a", {"rel": "prev"})
+            if not prev:
+                break
+            url = 'https://%s%s' % (server, prev['href'])
             logging.info('No messages, falling back to %s', url)
             sleep(fallback_sleep)
 
@@ -135,6 +137,13 @@ def main():
     for room in (109983, 117114):
         info = fetcher.latest(room, "chat.stackexchange.com")
         print(info)
+    """
+    # Really slow, will scroll all the way back to 2016
+    for room in (111347,): # SObotics
+    """
+    for room in (233626,):
+        for message in fetcher.messages("chat.stackoverflow.com", room):
+            print(message)
 
 
 if __name__ == '__main__':
