@@ -62,6 +62,8 @@ class Transcript:
         for soup, url in self.fetch(server, room):
             title = soup.title.string
             assert ' - ' in title
+            # Title sometimes contains ' (page 1 of 2)' after date
+            title = title.split(' (page ')[0]
             datestr = title.rsplit(' - ', 1)[-1]
             date = datetime.strptime(datestr, '%Y-%m-%d')
 
