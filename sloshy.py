@@ -130,6 +130,9 @@ class Room:
     def is_home_room(self) -> bool:
         return self.homeroom
 
+    def transcript_url(self) -> str:
+        return 'https://%s/transcript/%i' % (self.server, self.id)
+
     def send_message(self, message: str) -> None:
         if self._chatroom is None:
             chat = self.clients.get_client_for_server(self.server)
@@ -293,12 +296,17 @@ class Sloshy:
             if room.is_home_room() and 'scan_homeroom' not in self.config:
                 continue
             room_latest = fetcher.latest(room.id, room.server)
-            when = room_latest['when']
-            age = now-when
-            # Trim microseconds
-            age = age - timedelta(microseconds=age.microseconds)
-            msg = '[%s](%s): latest activity %s (%s hours ago)' % (
-                room.name, room_latest['url'], when, age)
+            if room_latest:
+                when = room_latest['when']
+                age = now-when
+                # Trim microseconds
+                age = age - timedelta(microseconds=age.microseconds)
+                msg = '[%s](%s): latest activity %s (%s hours ago)' % (
+                    room.name, room_latest['url'], when, age)
+            else:
+                msg = '[%s](%s): no non-feed, non-admin activity ever' % (
+                        room.name, room.transcript_url())
+                age = maxage + 1
             self.send_chat_message(homeroom, msg)
             logging.info(msg)
             if age > maxage:
