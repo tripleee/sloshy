@@ -306,7 +306,7 @@ class Sloshy:
             else:
                 msg = '[%s](%s): no non-feed, non-admin activity ever' % (
                         room.name, room.transcript_url())
-                age = maxage + 1
+                age = maxage + timedelta(days=1)
             self.send_chat_message(homeroom, msg)
             logging.info(msg)
             if age > maxage:
