@@ -14,15 +14,20 @@ The threshold is currently set to 12 days since the previous message,
 to leave some leeway for possible accidents
 (the freeze happens after 14 days of inactivity).
 
+
 ## Configuration
 
 There is no interactive interface to the bot;
 create a pull request if you would like to add a room
 to Sloshy's watch list.
 
+| :warning:      | Configuration file format changed in PR #23 |
+|----------------|:--------------------------------------------|
+
 In the YAML configuration file, add the server's name
-to the `rooms` key if it is missing (though that's unlikely)
-and create a new entry with information about the room you want to add;
+to the `servers` key if it is missing (though that's unlikely)
+and create a new `rooms` entry with information about the room
+you want to add;
 
 * The `id` is the room's numeric identifier.
   This (together with the server's name) is the way Sloshy finds the room.
@@ -42,18 +47,20 @@ and create a new entry with information about the room you want to add;
 In brief, if your chatroom's URL is
 https://chat.stackexchange.com/rooms/12345/my-room,
 and your network account ID is 123456789, you would add
-```
-rooms:
- - chat.stackexchange.com:
-   - name: "my room's name"
+```yaml
+servers:
+ chat.stackexchange.com:
+   rooms:
+   - contact: your name (123456789)
      id: 12345
-     contact: your name (123456789)
+     name: "my room's name"
+   sloshy_id: 514718
 ```
 in the configuration file.
 (This is showing the complete YAML structure;
-the `rooms` top-level key
-and the server `chat.stackexchange.com` obviously already exist
-in the file.)
+the `servers` top-level key
+and the server `chat.stackexchange.com` with the corresponding `sloshy_id`
+obviously already exist in the file.)
 
 Please separately make sure that Sloshy has write access to
 any privileged room you want to add to the list.
@@ -62,12 +69,32 @@ Perhaps notice also that there are two main chat servers
 with very similar names,
 where one contains "overflow" and the other contains "exchange".
 
-Besides `rooms`, there are some other configuration options
+
+### Migrating Old Configurations
+
+There is an option `--migrate` which accepts a YAML file argument
+and rewrites it from the old schema to the new.
+
+Example:
+
+```sh
+python3 sloshy.py --migrate sloshy.yaml
+```
+
+The old configuration file format did not have a schema identifier.
+The migration code simply assumes that your file uses the old schema.
+
+
+### Configuration Options
+
+Besides `servers`, there are some other configuration options
 which can be specified in the YAML file.
 For the most part, these are undocumented options
 for use in internal testing,
 but the following are expected to remain stable and supported:
 
+* `schema`: top-level key which identifies the YAML schema version
+  (currently 20211215, corresponding to the date 2021-12-15).
 * `local`: boolean; set to `true` to disable connecting to chat.
   Sloshy will still need to open network connections
   to fetch chat transcripts, but will not emit any chat messages.

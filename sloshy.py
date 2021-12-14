@@ -17,6 +17,10 @@ from chatexchange.client import Client as ChExClient, ChatActionError
 from scrape_chat import Transcript
 
 
+class SchemaError(Exception):
+    pass
+
+
 class LocalClientRequestQueue:
     "Quick hack to support logout() method"
     def empty(self):
@@ -111,13 +115,21 @@ class Chatclients:
 class Room:
     """
     Chat room with server, id, and a name for human-readable messages.
-    Also, handle to a Chatclients object which instantiates clients
-    as necessary.
+    Also, include Sloshy's chat id for this server, and a handle to a
+    Chatclients object which instantiates clients as necessary.
     """
-    def __init__(self, server: str, id: int, name: str, clients: Chatclients):
+    def __init__(
+            self,
+            server: str,
+            id: int,
+            name: str,
+            sloshy_id: int,
+            clients: Chatclients
+    ):
         self.server = server
         self.id = id
         self.name = name
+        self.sloshy_id = sloshy_id
         self.clients = clients
 
         self.homeroom = False
@@ -142,6 +154,9 @@ class Room:
         else:
             room = self._chatroom
         room.send_message(message)
+
+    def get_sloshy_id(self) -> int:
+        return self.sloshy_id
 
 
 class Sloshy:
@@ -178,7 +193,22 @@ class Sloshy:
 
         with open(conffile, 'r') as filehandle:
             config = yaml.safe_load(filehandle)
-        assert 'rooms' in config
+
+        warning = None
+
+        if 'schema' not in config:
+            warning = 'Config file does not contain key "schema". ' \
+                ' Run with --migrate?'
+
+        if config['schema'] != 20211215:
+            warning = 'Config file uses old schema %i; run with --migrate?' % (
+                config['schema'])
+
+        if warning is not None:
+            logging.error(warning)
+            raise SchemaError(warning)
+
+        assert 'servers' in config
 
         self.config = config
         self.rooms = []
@@ -190,28 +220,33 @@ class Sloshy:
         clients = Chatclients(local=self.local)
         self.chatclients = clients
 
-        for item in self.config['rooms']:
-            for server, rooms in item.items():
-                if server in self.chatclients.servers:
+        for server in self.config['servers']:
+            if server in self.chatclients.servers:
+                logging.warning(
+                    'Skipping duplicate server %s in %s', server, conffile)
+                continue
+
+            assert 'sloshy_id' in self.config['servers'][server]
+            sloshy_id = self.config['servers'][server]['sloshy_id']
+
+            assert 'rooms' in self.config['servers'][server]
+            seen = set()
+            for room in self.config['servers'][server]['rooms']:
+                assert 'id' in room
+                assert 'name' in room
+                if room['id'] in seen:
                     logging.warning(
-                        'Duplicate server %s in %s', server, conffile)
-                seen = set()
-                for idx in range(len(item[server])):
-                    room = item[server][idx]
-                    assert 'id' in room
-                    assert 'name' in room
-                    if room['id'] in seen:
-                        logging.warning(
-                            'Skipping duplicate room %s:%s (%s) in %s',
-                            server, room['id'], room['name'], conffile)
-                        continue
-                    seen.add(room['id'])
-                    roomobj = Room(server, room['id'], room['name'], clients)
-                    self.rooms.append(roomobj)
-                    if 'role' in room and room['role'] == 'home':
-                        assert self.homeroom is None
-                        self.homeroom = roomobj
-                        roomobj.set_as_home_room()
+                        'Skipping duplicate room %s:%s (%s) in %s',
+                        server, room['id'], room['name'], conffile)
+                    continue
+                seen.add(room['id'])
+                roomobj = Room(
+                    server, room['id'], room['name'], sloshy_id, clients)
+                self.rooms.append(roomobj)
+                if 'role' in room and room['role'] == 'home':
+                    assert self.homeroom is None
+                    self.homeroom = roomobj
+                    roomobj.set_as_home_room()
         assert self.homeroom is not None
 
         if 'auth' in config:
@@ -219,6 +254,28 @@ class Sloshy:
             self.password = config['auth']['password']
             # Gripe a bit, we don't want users to embed authnz in the file
             logging.warning('Chat username and password read from config')
+
+    def migrate(self):
+        """
+        Rewrite older-format configuration file using new YAML schema.
+
+        The meat is in the migrated_config method which reads the old
+        config and returns the new format.
+        """
+        updated_config = self.migrated_config()
+        with open(self.conffile, 'w', encoding='utf-8') as newconf:
+            yaml.dump(updated_config, newconf)
+
+    def migrated_config(self):
+        """
+        No-op in the base class.  Subclasses should inherit and provide
+        a migration path to the new base class.
+        """
+        warning = 'Already at the newest version of the schema %s' % (
+            self.config['schema'])
+        logging.error(warning)
+        raise SchemaError(warning)
+        # return self.config
 
     def nodename(self):
         """
@@ -328,11 +385,106 @@ class Sloshy:
         self.chatclients.logout()
 
 
+class SloshyLegacyConfig20211215(Sloshy):
+    """
+    Child class with the original configuration file processing
+    and a migration method for updating to the new format.
+    """
+    def load_conf(self, conffile=None):
+        """
+        Load YAML config from self.conffile, or the given file if specified
+        """
+        if conffile is None:
+            assert self.conffile is not None
+            conffile = self.conffile
+
+        with open(conffile, 'r') as filehandle:
+            config = yaml.safe_load(filehandle)
+        assert 'rooms' in config
+
+        self.config = config
+        self.rooms = []
+        self.homeroom = None
+
+        if not self.local and 'local' in config:
+            self.local = bool(config['local'])
+
+        clients = Chatclients(local=self.local)
+        self.chatclients = clients
+
+        for item in self.config['rooms']:
+            for server, rooms in item.items():
+                if server in self.chatclients.servers:
+                    logging.warning(
+                        'Duplicate server %s in %s', server, conffile)
+                seen = set()
+                for idx in range(len(item[server])):
+                    room = item[server][idx]
+                    assert 'id' in room
+                    assert 'name' in room
+                    if room['id'] in seen:
+                        logging.warning(
+                            'Skipping duplicate room %s:%s (%s) in %s',
+                            server, room['id'], room['name'], conffile)
+                        continue
+                    seen.add(room['id'])
+                    roomobj = Room(server, room['id'], room['name'], clients)
+                    self.rooms.append(roomobj)
+                    if 'role' in room and room['role'] == 'home':
+                        assert self.homeroom is None
+                        self.homeroom = roomobj
+                        roomobj.set_as_home_room()
+        assert self.homeroom is not None
+
+        if 'auth' in config:
+            self.email = config['auth']['email']
+            self.password = config['auth']['password']
+            # Gripe a bit, we don't want users to embed authnz in the file
+            logging.warning('Chat username and password read from config')
+
+    def migrated_config(self):
+        # Stupidly hard-code information which should be in the config
+        sloshy_id = {
+            'chat.stackoverflow.com': 16115299,
+            'chat.stackexchange.com': 514718,
+            'chat.meta.stackexchange.com': 1018361
+        }
+        servers = []
+        for serverdict in self.config['rooms']:
+            servers.extend(serverdict.keys())
+
+        for server in servers:
+            if server in sloshy_id:
+                continue
+            logging.warning(
+                'Server %s not known to migration code - abort', server)
+        assert all(x in sloshy_id for x in servers)
+
+        serverconfigs = dict()
+        for serverdict in self.config['rooms']:
+            for server in serverdict.keys():
+                serverconfigs[server] = {
+                    'sloshy_id': sloshy_id[server],
+                    'rooms': serverdict[server]
+                }
+
+        return {'schema': 20211215, 'servers': serverconfigs}
+
+
 def main():
     from sys import argv
     logging.basicConfig(level=logging.INFO)
-    Sloshy(argv[1] if len(argv) > 1 else "test.yaml").perform_scan(
-        argv[2] if len(argv) > 2 else None)
+
+    if len(argv) > 1 and argv[1] == '--migrate':
+        SloshyLegacyConfig20211215(
+            argv[2] if len(argv) > 2 else "sloshy.yaml").migrate()
+        exit(0)
+
+    me = Sloshy(argv[1] if len(argv) > 1 else "test.yaml")
+    if len(argv) > 3 and argv[3] == '--announce':
+        me.test_rooms(argv[4] if len(argv) > 4 else None)
+    else:
+        me.perform_scan(argv[2] if len(argv) > 2 else None)
 
 
 if __name__ == '__main__':
