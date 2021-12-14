@@ -481,10 +481,7 @@ def main():
         exit(0)
 
     me = Sloshy(argv[1] if len(argv) > 1 else "test.yaml")
-    if len(argv) > 3 and argv[3] == '--announce':
-        me.test_rooms(argv[4] if len(argv) > 4 else None)
-    else:
-        me.perform_scan(argv[2] if len(argv) > 2 else None)
+    me.perform_scan(argv[2] if len(argv) > 2 else None)
 
 
 if __name__ == '__main__':
