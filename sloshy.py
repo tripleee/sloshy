@@ -291,9 +291,12 @@ class Sloshy:
 
     def generate_chat_message(self):
         """
-        Output a random witty, witty unfreeze message
+        Output a random witty, witty unfreeze message.
+
+        Starting with PR#23 (December 2021), include a tag to make these
+        easier to search for.
         """
-        return random.choice((
+        return '[tag:unfreeze] ' + random.choice((
             'thaw',
             'sprinkling antifreeze',
             '!freeze',
@@ -309,11 +312,58 @@ class Sloshy:
         if not self.local:
             sleep(3)
 
+    def startup_notice(self, room: Room, message: str):
+        """
+        Send a startup message to the specified room.
+        The startup message has a link to the Github repo and
+        includes the output from self.nodename().
+        """
+        self.send_chat_message(
+            room, '[Sloshy](%s) startup: %s on %s' % (
+                'https://github.com/tripleee/sloshy',
+                message,
+                self.nodename()))
+
     def notice(self, room: Room):
         """
         Drop a thawing notice in room
         """
         self.send_chat_message(room, self.generate_chat_message())
+
+    def test_rooms(self, announce=None):
+        """
+        Test write access in all the rooms in the configuration.
+
+        If Sloshy already has posted a message to a room, regard it as
+        tested. If not, attempt to write the announcement message to the
+        room in question.
+
+        If announce is missing, empty, or None, default to "test run".
+        """
+        if not announce:
+            announce = "test run"
+
+        fetcher = Transcript()
+        self.startup_notice(self.homeroom, announce)
+        for room in self.rooms:
+            sloshy_id = room.get_sloshy_id()
+            for phrase in (
+                    'tagged/unfreeze',
+                    # Fall back to static search for keywords in legacy notices
+                    'thaw', 'antifreeze', 'freeze', 'heat', 'thawman'):
+                found = fetcher.search(room.server, room.id, sloshy_id, phrase)
+                if found:
+                    logging.info('Found: %s', found)
+                    break
+                # Sleeps established experimentally
+                # The site starts emitting 409 errors if we go too fast
+                # but it's not really clear what it regards as too fast
+                logging.info('Sleeping between searches ...')
+                sleep(3)
+            logging.info('Sleeping between searches ...')
+            sleep(3)
+            if not found:
+                self.send_chat_message(room, '[tag:unfreeze] %s' % announce)
 
     def scan_rooms(self, startup_message=None):
         """
@@ -323,7 +373,7 @@ class Sloshy:
 
         The startup_message is included in the notification in the
         monitoring room when Sloshy starts up.
-        If it is missing or None, it defaults to "manual run".
+        If it is empty, missing, or None, it defaults to "manual run".
         """
         if not startup_message:
             startup_message = "manual run"
@@ -344,11 +394,7 @@ class Sloshy:
 
         fetcher = Transcript()
         homeroom = self.homeroom
-        self.send_chat_message(
-            homeroom, '[Sloshy](%s) startup: %s on %s' % (
-                'https://github.com/tripleee/sloshy',
-                startup_message,
-                self.nodename()))
+        self.startup_notice(homeroom, startup_message)
         for room in self.rooms:
             if room.is_home_room() and 'scan_homeroom' not in self.config:
                 continue
@@ -379,7 +425,10 @@ class Sloshy:
 
     def perform_scan(self, startup_message=None):
         """
-        Entry point for a single scan: Perform scan_rooms, then logout().
+        Entry point for a single scan: Perform room scan, then logout().
+
+        If startup_message is given, provide this as the identifying message
+        for Sloshy.
         """
         self.scan_rooms(startup_message)
         self.chatclients.logout()
@@ -481,7 +530,10 @@ def main():
         exit(0)
 
     me = Sloshy(argv[1] if len(argv) > 1 else "test.yaml")
-    me.perform_scan(argv[2] if len(argv) > 2 else None)
+    if len(argv) > 3 and argv[3] == '--announce':
+        me.test_rooms(argv[4] if len(argv) > 4 else None)
+    else:
+        me.perform_scan(argv[2] if len(argv) > 2 else None)
 
 
 if __name__ == '__main__':

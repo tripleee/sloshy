@@ -6,6 +6,7 @@ from datetime import datetime
 from time import sleep
 import platform
 import logging
+from typing import Optional
 
 import requests
 from bs4 import BeautifulSoup
@@ -20,6 +21,15 @@ class Transcript:
         platform.python_version(),
         requests.__version__)
 
+    def _get_requests_soup(self, url: str) -> BeautifulSoup:
+        """
+        Simple wrapper to set the User-Agent: correctly and fetch a page,
+        then return the BeautifulSoup parse of the result.
+        """
+        result = requests.get(url, headers={'User-Agent': self.UA})
+        result.raise_for_status()
+        return BeautifulSoup(result.text, 'html.parser')
+
     def fetch(
             self, server: str, room: int,
             fallback_sleep: int = 1
@@ -29,18 +39,13 @@ class Transcript:
         and extract the .text component as a BeautifulSoup object, and the
         URL it was fetched from.
 
-        On each fetch, send the User-Agent: header of this client.
-
         Optionally sleep before fetching an older page; the fallback_sleep
         integer argument controls this.
         """
         url = "https://%s/transcript/%i" % (server, room)
         while True:
             logging.info('Fetching %s', url)
-            transcript = requests.get(
-                url, headers={'User-Agent': __class__.UA}).text
-            soup = BeautifulSoup(transcript, 'html.parser')
-
+            soup = self._get_requests_soup(url)
             yield soup, url
 
             trans = soup.body.find("div", {"id": "transcript"})
@@ -127,6 +132,25 @@ class Transcript:
             if message['user']['id'] < 0:
                 continue
             return message
+
+    def search(
+            self, server: str, room: int, user: int, phrase: str
+    ) -> Optional[str]:
+        """
+        Search room on server for posts by user containing phrase.
+        Return the URL where the newest post was found, or None if it wasn't.
+        """
+        logging.info(
+            'Searching for %s by user %i in room %s:%i',
+            phrase, user, server, room)
+        url = 'https://%s/search?q=%s&user=%i&room=%i' % (
+            server, requests.utils.quote(phrase, safe=''), user, room)
+        found = self._get_requests_soup(url)
+        content = found.body.find("div", {"id": "content"})
+        if '\n0 messages found' in content.text:
+            return None
+        messages = content.find("div", {"class": "messages"})
+        return 'https://%s%s' % (server, messages.find("a")['href'])
 
 
 def main():
