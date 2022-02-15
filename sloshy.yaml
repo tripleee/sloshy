@@ -1,106 +1,112 @@
-rooms:
- - chat.stackoverflow.com:
-   - name: "SOBotics"
-     id: 111347
-     role: home
-     contact: tripleee (468289)
-   - name: "friendly bin"
-     id: 109494
-     contact: tripleee (468289)
-   - name: "Git"
-     id: 228186
-     contact: user1271772 (1327177)
-   - name: "Sloshy the Thawman"
-     id: 233626
-     contact: tripleee (468289)
-   - name: "Duck Overflow"
-     id: 193903
-     contact: samcarter (3270911)
-   - name: "shree's room"
-     id: 232981
-     contact: Shree (965146)
-   - name: "Google Apps Script chat community"
-     id: 217630
-     contact: oleg-valter (15810379)
-   - name: "V-eye"
-     id: 240030
-     contact: oleg-valter (15810379)
- - chat.stackexchange.com:
-   - name: "Matter Modeling: Meta"
-     id: 113019
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: Phonopy software"
-     id: 112358
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: LAMMPS software"
-     id: 109805
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: GROMACS software"
-     id: 120383
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: GPAW software"
-     id: 112878
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: Quantum ESPRESSO software"
-     id: 117642
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: VASP software"
-     id: 109983
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: HPQC (High Performance & Quantum Computing)"
-     id: 117114
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: Mathematics & Science related to Matter Modeling"
-     id: 119831
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: Protein folding, docking, and biomatter modeling"
-     id: 113915
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: GAUSSIAN software"
-     id: 110569
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: ASE software"
-     id: 111469
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: Spectroscopy & Potentiology"
-     id: 117652
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: Physical Properties of Materials"
-     id: 110288
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: MOLPRO software"
-     id: 112274
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: Testing Feeds"
-     id: 108277
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: HNQ"
-     id: 109935
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: Bounties"
-     id: 109905
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: Questions related to Matter Modeling, but posted in other places (e.g. other SE sites, or Reddit)"
-     id: 110113
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: Ask a Moderator"
-     id: 110431
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: Announcements of user or site milestones achieved"
-     id: 109902
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: General chat room"
-     id: 107323
-     contact: user1271772 (1327177)
-   - name: "Matter Modeling: Q-Chem software"
-     id: 109797
-     contact: user1271772 (1327177)
-   - name: "Area 51: Matter Modeling Proposal"
-     id: 104555
-     contact: user1271772 (1327177)
-   - name: "Physics questions at MMSE"
-     id: 111122
-     contact: user1271772 (1327177)
-   - name: "Room for testing ElectionBot on *.stackexchange.com elections"
-     id: 92073
-     contact: oleg-valter (15810379)
+schema: 20211215
+servers:
+  chat.stackexchange.com:
+    rooms:
+    - contact: user1271772 (1327177)
+      id: 113019
+      name: 'Matter Modeling: Meta'
+    - contact: user1271772 (1327177)
+      id: 112358
+      name: 'Matter Modeling: Phonopy software'
+    - contact: user1271772 (1327177)
+      id: 109805
+      name: 'Matter Modeling: LAMMPS software'
+    - contact: user1271772 (1327177)
+      id: 120383
+      name: 'Matter Modeling: GROMACS software'
+    - contact: user1271772 (1327177)
+      id: 112878
+      name: 'Matter Modeling: GPAW software'
+    - contact: user1271772 (1327177)
+      id: 117642
+      name: 'Matter Modeling: Quantum ESPRESSO software'
+    - contact: user1271772 (1327177)
+      id: 109983
+      name: 'Matter Modeling: VASP software'
+    - contact: user1271772 (1327177)
+      id: 117114
+      name: 'Matter Modeling: HPQC (High Performance & Quantum Computing)'
+    - contact: user1271772 (1327177)
+      id: 119831
+      name: 'Matter Modeling: Mathematics & Science related to Matter Modeling'
+    - contact: user1271772 (1327177)
+      id: 113915
+      name: 'Matter Modeling: Protein folding, docking, and biomatter modeling'
+    - contact: user1271772 (1327177)
+      id: 110569
+      name: 'Matter Modeling: GAUSSIAN software'
+    - contact: user1271772 (1327177)
+      id: 111469
+      name: 'Matter Modeling: ASE software'
+    - contact: user1271772 (1327177)
+      id: 117652
+      name: 'Matter Modeling: Spectroscopy & Potentiology'
+    - contact: user1271772 (1327177)
+      id: 110288
+      name: 'Matter Modeling: Physical Properties of Materials'
+    - contact: user1271772 (1327177)
+      id: 112274
+      name: 'Matter Modeling: MOLPRO software'
+    - contact: user1271772 (1327177)
+      id: 108277
+      name: 'Matter Modeling: Testing Feeds'
+    - contact: user1271772 (1327177)
+      id: 109935
+      name: 'Matter Modeling: HNQ'
+    - contact: user1271772 (1327177)
+      id: 109905
+      name: 'Matter Modeling: Bounties'
+    - contact: user1271772 (1327177)
+      id: 110113
+      name: 'Matter Modeling: Questions related to Matter Modeling, but posted in
+        other places (e.g. other SE sites, or Reddit)'
+    - contact: user1271772 (1327177)
+      id: 110431
+      name: 'Matter Modeling: Ask a Moderator'
+    - contact: user1271772 (1327177)
+      id: 109902
+      name: 'Matter Modeling: Announcements of user or site milestones achieved'
+    - contact: user1271772 (1327177)
+      id: 107323
+      name: 'Matter Modeling: General chat room'
+    - contact: user1271772 (1327177)
+      id: 109797
+      name: 'Matter Modeling: Q-Chem software'
+    - contact: user1271772 (1327177)
+      id: 104555
+      name: 'Area 51: Matter Modeling Proposal'
+    - contact: user1271772 (1327177)
+      id: 111122
+      name: Physics questions at MMSE
+    - contact: oleg-valter (15810379)
+      id: 92073
+      name: "Room for testing ElectionBot on *.stackexchange.com elections" 
+    sloshy_id: 514718
+  chat.stackoverflow.com:
+    rooms:
+    - contact: tripleee (468289)
+      id: 111347
+      name: SOBotics
+      role: home
+    - contact: tripleee (468289)
+      id: 109494
+      name: friendly bin
+    - contact: user1271772 (1327177)
+      id: 228186
+      name: Git
+    - contact: tripleee (468289)
+      id: 233626
+      name: Sloshy the Thawman
+    - contact: samcarter (3270911)
+      id: 193903
+      name: Duck Overflow
+    - contact: Shree (965146)
+      id: 232981
+      name: shree's room
+    - contact: oleg-valter (15810379)
+      id: 217630
+      name: Google Apps Script chat community
+    - contact: oleg-valter (15810379)
+      name: "V-eye"
+      id: 240030
+    sloshy_id: 16115299
