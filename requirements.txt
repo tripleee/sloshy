@@ -1,4 +1,5 @@
 requests
 BeautifulSoup4
-ChatExchange
+#ChatExchange>0.0.4
+git+https://github.com/Manishearth/ChatExchange.git@39226e28ce45f90577dad0efd2e52a7ec1887e51
 PyYAML
