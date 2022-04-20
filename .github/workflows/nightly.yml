@@ -13,12 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      # Runs a single command using the runners shell
       - name: run.py
         env:
           SLOSHY_EMAIL: ${{secrets.SLOSHY_EMAIL}}
           SLOSHY_PASSWORD: ${{secrets.SLOSHY_PASSWORD}}
         run: |
+          pip3 install --upgrade pip setuptools wheel
           pip3 install -r requirements.txt
           python3 ./run.py
