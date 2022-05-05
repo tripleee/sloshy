@@ -109,4 +109,7 @@ servers:
     - contact: oleg-valter (15810379)
       name: "V-eye"
       id: 240030
+    - contact: oleg-valter (15810379)
+      name: "[dev] SpotDetector"
+      id: 244392
     sloshy_id: 16115299
