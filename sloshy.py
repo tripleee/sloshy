@@ -129,6 +129,7 @@ class Room:
         self.server = server
         self.id = id
         self.name = name
+        self.escaped_name = name.replace('[', '\[').replace(']', '\]')
         self.sloshy_id = sloshy_id
         self.clients = clients
 
@@ -405,10 +406,10 @@ class Sloshy:
                 # Trim microseconds
                 age = age - timedelta(microseconds=age.microseconds)
                 msg = '[%s](%s): latest activity %s (%s hours ago)' % (
-                    room.name, room_latest['url'], when, age)
+                    room.escaped_name, room_latest['url'], when, age)
             else:
                 msg = '[%s](%s): no non-feed, non-admin activity ever' % (
-                        room.name, room.transcript_url())
+                        room.escaped_name, room.transcript_url())
                 age = maxage + timedelta(days=1)
             self.send_chat_message(homeroom, msg)
             logging.info(msg)
@@ -417,7 +418,7 @@ class Sloshy:
                     self.notice(room)
                     self.send_chat_message(
                         homeroom, '%s: Age threshold exceeded;'
-                        ' sending a thawing notice' % room.name)
+                        ' sending a thawing notice' % room.escaped_name)
                 except ChatActionError as err:
                     self.send_chat_message(
                         homeroom, '%s: Age threshold exceeded,'
