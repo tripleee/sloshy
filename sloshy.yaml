@@ -109,6 +109,9 @@ servers:
     - contact: oleg-valter (15810379)
       name: "V-eye"
       id: 240030
+    - contact: Nic (64473)
+      name: "Sustainable Living"
+      id: 7310
     - contact: oleg-valter (15810379)
       name: "[dev] SpotDetector"
       id: 244392
