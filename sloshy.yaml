@@ -81,6 +81,9 @@ servers:
     - contact: oleg-valter (15810379)
       id: 92073
       name: "Room for testing ElectionBot on *.stackexchange.com elections" 
+    - contact: Nic (64473)
+      name: "Sustainable Living"
+      id: 7310
     sloshy_id: 514718
   chat.stackoverflow.com:
     rooms:
