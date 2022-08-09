@@ -80,7 +80,7 @@ servers:
       name: Physics questions at MMSE
     - contact: oleg-valter (15810379)
       id: 92073
-      name: "Room for testing ElectionBot on *.stackexchange.com elections" 
+      name: "Room for testing ElectionBot on *.stackexchange.com elections"
     - contact: Nic (64473)
       name: "Sustainable Living"
       id: 7310
@@ -115,4 +115,7 @@ servers:
     - contact: oleg-valter (15810379)
       name: "[dev] SpotDetector"
       id: 244392
+    - contact: oleg-valter (15810379)
+      name: "Userscript newbies and friends"
+      id: 214345
     sloshy_id: 16115299
