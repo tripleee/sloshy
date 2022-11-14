@@ -56,7 +56,10 @@ class LocalClient:
         assert self.room is not None
         logging.info(
             'local - %s/rooms/%i: not sending message', self.host, self.room)
-        print(message)
+        if message:
+            print(message)
+        else:
+            print('(Not printing any message, just checking ability to join)')
 
     def logout(self):
         logging.info('local - %s/rooms/%i: logging out', self.host, self.room)
@@ -154,7 +157,8 @@ class Room:
             self._chatroom = room
         else:
             room = self._chatroom
-        room.send_message(message)
+        if message:
+            room.send_message(message)
 
     def get_sloshy_id(self) -> int:
         return self.sloshy_id
@@ -335,19 +339,25 @@ class Sloshy:
         """
         Test write access in all the rooms in the configuration.
 
-        If Sloshy already has posted a message to a room, regard it as
-        tested. If not, attempt to write the announcement message to the
-        room in question.
+        If announce is missing / None, simply try to enter each room
+        in turn, but don't post any message.
 
-        If announce is missing, empty, or None, default to "test run".
+        Otherwise, check if Sloshy has already has posted a message to
+        each room in turn; if we have, regard it as tested. If not,
+        attempt to write the announcement message to the room in question.
+
         """
-        if not announce:
-            announce = "test run"
-
         fetcher = Transcript()
-        self.startup_notice(self.homeroom, announce)
+        counter = {'server': set(), 'id': set()}
+        self.startup_notice(self.homeroom, announce or "room test")
         for room in self.rooms:
             sloshy_id = room.get_sloshy_id()
+            if announce is None:
+                logging.info('Joining %s/rooms/%i', room.server, room.id)
+                room.send_message("")  # just join, don't send anything
+                counter['server'].add(room.server)
+                counter['id'].add("%s/%i" % (room.server,room.id))
+                continue
             for phrase in (
                     'tagged/unfreeze',
                     # Fall back to static search for keywords in legacy notices
@@ -365,6 +375,11 @@ class Sloshy:
             sleep(3)
             if not found:
                 self.send_chat_message(room, '[tag:unfreeze] %s' % announce)
+        if announce is None:
+            self.send_chat_message(
+                self.homeroom,
+                "scanned %i rooms on %i servers" % (
+                    len(counter['id']), len(counter['server'])))
 
     def scan_rooms(self, startup_message=None):
         """
@@ -531,8 +546,8 @@ def main():
         exit(0)
 
     me = Sloshy(argv[1] if len(argv) > 1 else "test.yaml")
-    if len(argv) > 3 and argv[3] == '--announce':
-        me.test_rooms(argv[4] if len(argv) > 4 else None)
+    if len(argv) > 2 and argv[2] in ('--announce', '--test-rooms'):
+        me.test_rooms(argv[3] if len(argv) > 3 else None)
     else:
         me.perform_scan(argv[2] if len(argv) > 2 else None)
 
