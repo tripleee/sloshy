@@ -33,3 +33,11 @@ jobs:
         SLOSHY_PASSWORD: ${{secrets.SLOSHY_PASSWORD}}
       run:
         python sloshy.py test-pushed.yaml "Github Actions Push test"
+    - name: Check availability of all rooms
+      env:
+        SLOSHY_EMAIL: ${{secrets.SLOSHY_EMAIL}}
+        SLOSHY_PASSWORD: ${{secrets.SLOSHY_PASSWORD}}
+      run: |
+        python make-test-yaml.py
+        python sloshy.py room-test.yaml --test-rooms
+        rm room-test.yaml
