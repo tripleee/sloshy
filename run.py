@@ -15,4 +15,6 @@ from sloshy import Sloshy
 if __name__ == '__main__':
     assert 'SLOSHY_EMAIL' in os.environ
     assert 'SLOSHY_PASSWORD' in os.environ
-    Sloshy("sloshy.yaml").perform_scan("nightly run")
+    sloshy = Sloshy("sloshy.yaml")
+    sloshy.test_rooms()
+    sloshy.perform_scan("nightly run")
