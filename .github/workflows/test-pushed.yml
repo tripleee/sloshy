@@ -33,11 +33,22 @@ jobs:
         SLOSHY_PASSWORD: ${{secrets.SLOSHY_PASSWORD}}
       run:
         python sloshy.py test-pushed.yaml "Github Actions Push test"
+    - name: Generate config file for tests from production config
+      run:
+        python make-test-yaml.py      
     - name: Check availability of all rooms
       env:
         SLOSHY_EMAIL: ${{secrets.SLOSHY_EMAIL}}
         SLOSHY_PASSWORD: ${{secrets.SLOSHY_PASSWORD}}
-      run: |
-        python make-test-yaml.py
+      run:
         python sloshy.py room-test.yaml --test-rooms
+    - name: Announce presence in any new rooms
+      env:
+        SLOSHY_EMAIL: ${{secrets.SLOSHY_EMAIL}}
+        SLOSHY_PASSWORD: ${{secrets.SLOSHY_PASSWORD}}
+      run: |
+        python sloshy.py room-test.yaml \
+               --announce "Sloshy is here! (See profile for details)"
+    - name: Clean up config file after tests
+      run:
         rm room-test.yaml
