@@ -375,6 +375,10 @@ class Sloshy:
             sleep(3)
             if not found:
                 self.send_chat_message(room, '[tag:unfreeze] %s' % announce)
+                self.send_chat_message(
+                    self.home_room,
+                    'announced presence in %s/rooms/%i' % (
+                        room.server, room.id))
         if announce is None:
             self.send_chat_message(
                 self.homeroom,
