@@ -15,7 +15,7 @@ import yaml
 from chatexchange.client import Client as ChExClient, ChatActionError
 from requests.exceptions import RequestException
 
-from scrape_chat import Transcript
+from scrape_chat import Transcript, TranscriptFrozenDeletedException
 
 
 class SchemaError(Exception):
@@ -464,7 +464,8 @@ class Sloshy:
                 continue
             try:
                 room_latest = fetcher.latest(room.id, room.server)
-            except RequestException as exception:
+            except (TranscriptFrozenDeletedException, RequestException
+                    ) as exception:
                 self.log_notice(
                     '** Error: could not fetch transcript for %s'
                     % room.log_id)

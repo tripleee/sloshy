@@ -12,6 +12,20 @@ import requests
 from bs4 import BeautifulSoup
 
 
+class TranscriptException(Exception):
+    """
+    Base class for transcript errors
+    """
+    ...
+
+
+class TranscriptFrozenDeletedException(TranscriptException):
+    """
+    Exception thrown when a room is frozen or deleted
+    """
+    ...
+
+
 class Transcript:
     """
     Simple wrapper for fetching the transcript of a room.
@@ -113,6 +127,26 @@ class Transcript:
                     'link': url
                 }
 
+    def check_frozen_or_deleted(self, server: str, room: int) -> bool:
+        """
+        Raise an exception if the room's info page says it's frozen or deleted
+        """
+        # https://chat.stackexchange.com/rooms/info/140197/hnq-operations-research?tab=feeds
+        # https://chat.stackexchange.com/rooms/info/111121/modeling-questions-related-to-chemistry?tab=feeds
+
+        url = "https://%s/rooms/info/%i/?tab=feeds" % (server, room)
+        soup = self._get_requests_soup(url)
+
+        if 'Currently no feeds are being posted into this room.' in soup.text:
+            return False
+        for candidate in ('Because this room is deleted, no feeds are'
+                          ' being posted into this room.',
+                          'Because this room is frozen, no feeds are'
+                          ' being posted into this room.'):
+            if candidate in soup.text:
+                raise TranscriptFrozenDeletedException(candidate)
+        return False
+
     def latest(self, room: int, server: str) -> dict:
         """
         Fetch latest message from room on server. Return a dict of
@@ -127,6 +161,8 @@ class Transcript:
         """
         assert isinstance(room, int)
         room = int(room)
+
+        self.check_frozen_or_deleted(server, room)
 
         for message in self.messages(server, room):
             if message['user']['id'] < 0:
