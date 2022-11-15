@@ -13,6 +13,7 @@ import logging
 
 import yaml
 from chatexchange.client import Client as ChExClient, ChatActionError
+from requests.exceptions import RequestException
 
 from scrape_chat import Transcript
 
@@ -132,6 +133,7 @@ class Room:
         self.server = server
         self.id = id
         self.name = name
+        self.log_id = '%s/rooms/%i' % (server, id)
         self.escaped_name = name.replace('[', '\[').replace(']', '\]')
         self.sloshy_id = sloshy_id
         self.clients = clients
@@ -335,6 +337,13 @@ class Sloshy:
         """
         self.send_chat_message(room, self.generate_chat_message())
 
+    def log_notice(self, message: str):
+        """
+        Emit a log message to the home room, and as a warning
+        """
+        logging.warning(message)
+        self.send_chat_message(self.homeroom, message)
+
     def test_rooms(self, announce=None):
         """
         Test write access in all the rooms in the configuration.
@@ -348,21 +357,48 @@ class Sloshy:
 
         """
         fetcher = Transcript()
-        counter = {'server': set(), 'id': set()}
+        counter = {'server': set(), 'id': set(), 'fail': set()}
         self.startup_notice(self.homeroom, announce or "room test")
         for room in self.rooms:
             sloshy_id = room.get_sloshy_id()
             if announce is None:
-                logging.info('Joining %s/rooms/%i', room.server, room.id)
-                room.send_message("")  # just join, don't send anything
+                logging.info('Joining %s', room.log_id)
+                try:
+                    room.send_message("")  # just join, don't send anything
+                except KeyError as exception:
+                    # the immediate problem from a closed room is
+                    # ...
+                    #  File "./sloshy.py", line 156, in send_message
+                    #    room.join()
+                    #  File ".../chatexchange/rooms.py", line 50, in join
+                    #   return self._client._join_room(self.id)
+                    #  File ".../chatexchange/client.py", line 340, in _join_room
+                    #   self._br.join_room(room_id)
+                    #  File ".../chatexchange/browser.py", line 265, in join_room
+                    #   eventtime = response.json()['time']
+                    # KeyError: 'time'
+                    self.log_notice(
+                        '** Error: could not join %s' % room.log_id)
+                    self.log_notice(repr(exception))
+                    counter['fail'].add(room.log_id)
                 counter['server'].add(room.server)
-                counter['id'].add("%s/%i" % (room.server,room.id))
+                counter['id'].add(room.log_id)
                 continue
+            found = None
             for phrase in (
                     'tagged/unfreeze',
                     # Fall back to static search for keywords in legacy notices
                     'thaw', 'antifreeze', 'freeze', 'heat', 'thawman'):
-                found = fetcher.search(room.server, room.id, sloshy_id, phrase)
+                try:
+                    found = fetcher.search(
+                        room.server, room.id, sloshy_id, phrase)
+                except RequestException as exception:
+                    self.log_notice(
+                        '** Error: could not fetch transcript for %s'
+                        % room.log_id)
+                    self.log_notice(repr(exception))
+                    counter['fail'].add(room.log_id)
+                    break
                 if found:
                     logging.info('Found: %s', found)
                     break
@@ -374,16 +410,23 @@ class Sloshy:
             logging.info('Sleeping between searches ...')
             sleep(3)
             if not found:
-                self.send_chat_message(room, '[tag:unfreeze] %s' % announce)
-                self.send_chat_message(
-                    self.home_room,
-                    'announced presence in %s/rooms/%i' % (
-                        room.server, room.id))
+                try:
+                    self.send_chat_message(room, '[tag:unfreeze] %s' % announce)
+                except KeyError as exception:
+                    self.log_notice(
+                        '** Error: could not announce presence in %s'
+                        % room.log_id)
+                    self.log_notice(repr(exception))
+                    counter['fail'].add(room.log_id)
+                    continue
+                self.log_notice(
+                    'announced presence in %s' % room.log_id)
         if announce is None:
-            self.send_chat_message(
-                self.homeroom,
-                "scanned %i rooms on %i servers" % (
+            self.log_notice(
+                'scanned %i rooms on %i servers' % (
                     len(counter['id']), len(counter['server'])))
+        if len(counter['fail']) > 0:
+            raise ValueError('failed to process rooms %s' % counter['fail'])
 
     def scan_rooms(self, startup_message=None):
         """
@@ -399,6 +442,7 @@ class Sloshy:
             startup_message = "manual run"
 
         now = datetime.now()
+        failure_count = 0
 
         # Default freeze schedule is 14 days; thaw a little before that,
         # just to be on the safe side.
@@ -418,7 +462,15 @@ class Sloshy:
         for room in self.rooms:
             if room.is_home_room() and 'scan_homeroom' not in self.config:
                 continue
-            room_latest = fetcher.latest(room.id, room.server)
+            try:
+                room_latest = fetcher.latest(room.id, room.server)
+            except RequestException as exception:
+                self.log_notice(
+                    '** Error: could not fetch transcript for %s'
+                    % room.log_id)
+                self.log_notice(repr(exception))
+                failure_count += 1
+                continue
             if room_latest:
                 when = room_latest['when']
                 age = now-when
@@ -430,18 +482,22 @@ class Sloshy:
                 msg = '[%s](%s): no non-feed, non-admin activity ever' % (
                         room.escaped_name, room.transcript_url())
                 age = maxage + timedelta(days=1)
-            self.send_chat_message(homeroom, msg)
+            self.log_notice(msg)
             logging.info(msg)
             if age > maxage:
                 try:
                     self.notice(room)
-                    self.send_chat_message(
-                        homeroom, '%s: Age threshold exceeded;'
-                        ' sending a thawing notice' % room.escaped_name)
+                    self.log_notice(
+                        '%s: Age threshold exceeded; sending a thawing notice'
+                        % room.escaped_name)
                 except ChatActionError as err:
-                    self.send_chat_message(
-                        homeroom, '%s: Age threshold exceeded,'
-                        ' but failed to thaw: %s' % err)
+                    self.log_notice(
+                        '%s: Age threshold exceeded, but failed to thaw: %s'
+                        % (room.log_id, err))
+                    failure_count += 1
+
+        if failure_count:
+            raise ValueError('Failed to process %i rooms' % failure_count)
 
     def perform_scan(self, startup_message=None):
         """
@@ -450,8 +506,12 @@ class Sloshy:
         If startup_message is given, provide this as the identifying message
         for Sloshy.
         """
-        self.scan_rooms(startup_message)
-        self.chatclients.logout()
+        try:
+            self.scan_rooms(startup_message)
+        except Exception as exception:
+            raise
+        finally:
+            self.chatclients.logout()
 
 
 class SloshyLegacyConfig20211215(Sloshy):
