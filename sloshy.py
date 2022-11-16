@@ -445,7 +445,7 @@ class Sloshy:
             startup_message = "manual run"
 
         now = datetime.now()
-        failure_count = 0
+        failures = set()
 
         # Default freeze schedule is 14 days; thaw a little before that,
         # just to be on the safe side.
@@ -473,7 +473,7 @@ class Sloshy:
                     '** Error: could not fetch transcript for %s'
                     % room.log_id)
                 self.log_error(repr(exception))
-                failure_count += 1
+                failures.add(room.log_id)
                 continue
             if room_latest:
                 when = room_latest['when']
@@ -497,10 +497,11 @@ class Sloshy:
                     self.log_error(
                         '%s: Age threshold exceeded, but failed to thaw: %s'
                         % (room.log_id, err))
-                    failure_count += 1
+                    failures.add(room.id)
 
-        if failure_count:
-            raise ValueError('Failed to process %i rooms' % failure_count)
+        if failures:
+            raise ValueError('Failed to process %i rooms: %s' % (
+                len(failures), failures))
 
     def perform_scan(self, startup_message=None):
         """
