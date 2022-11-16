@@ -337,12 +337,15 @@ class Sloshy:
         """
         self.send_chat_message(room, self.generate_chat_message())
 
-    def log_notice(self, message: str):
+    def log_notice(self, message: str, log_emit=logging.info):
         """
         Emit a log message to the home room, and as a warning
         """
-        logging.warning(message)
+        log_emit(message)
         self.send_chat_message(self.homeroom, message)
+
+    log_warn = lambda self, x: self.log_notice(x, log_emit=logging.warning)
+    log_error = lambda self, x: self.log_notice(x, log_emit=logging.error)
 
     def test_rooms(self, announce=None):
         """
@@ -377,9 +380,9 @@ class Sloshy:
                     #  File ".../chatexchange/browser.py", line 265, in join_room
                     #   eventtime = response.json()['time']
                     # KeyError: 'time'
-                    self.log_notice(
+                    self.log_error(
                         '** Error: could not join %s' % room.log_id)
-                    self.log_notice(repr(exception))
+                    self.log_error(repr(exception))
                     counter['fail'].add(room.log_id)
                 counter['server'].add(room.server)
                 counter['id'].add(room.log_id)
@@ -393,10 +396,10 @@ class Sloshy:
                     found = fetcher.search(
                         room.server, room.id, sloshy_id, phrase)
                 except RequestException as exception:
-                    self.log_notice(
+                    self.log_error(
                         '** Error: could not fetch transcript for %s'
                         % room.log_id)
-                    self.log_notice(repr(exception))
+                    self.log_error(repr(exception))
                     counter['fail'].add(room.log_id)
                     break
                 if found:
@@ -413,10 +416,10 @@ class Sloshy:
                 try:
                     self.send_chat_message(room, '[tag:unfreeze] %s' % announce)
                 except KeyError as exception:
-                    self.log_notice(
+                    self.log_error(
                         '** Error: could not announce presence in %s'
                         % room.log_id)
-                    self.log_notice(repr(exception))
+                    self.log_error(repr(exception))
                     counter['fail'].add(room.log_id)
                     continue
                 self.log_notice(
@@ -466,10 +469,10 @@ class Sloshy:
                 room_latest = fetcher.latest(room.id, room.server)
             except (TranscriptFrozenDeletedException, RequestException
                     ) as exception:
-                self.log_notice(
+                self.log_error(
                     '** Error: could not fetch transcript for %s'
                     % room.log_id)
-                self.log_notice(repr(exception))
+                self.log_error(repr(exception))
                 failure_count += 1
                 continue
             if room_latest:
@@ -484,7 +487,6 @@ class Sloshy:
                         room.escaped_name, room.transcript_url())
                 age = maxage + timedelta(days=1)
             self.log_notice(msg)
-            logging.info(msg)
             if age > maxage:
                 try:
                     self.notice(room)
@@ -492,7 +494,7 @@ class Sloshy:
                         '%s: Age threshold exceeded; sending a thawing notice'
                         % room.escaped_name)
                 except ChatActionError as err:
-                    self.log_notice(
+                    self.log_error(
                         '%s: Age threshold exceeded, but failed to thaw: %s'
                         % (room.log_id, err))
                     failure_count += 1
