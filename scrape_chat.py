@@ -75,10 +75,17 @@ class Transcript:
 
     def messages(self, server: str, room: int) -> dict:
         """
-        Generator to retrieve increasingly old messages from the room's
+        Generator to retrieve increasingly older messages from the room's
         transcript.
 
         Yield a dict with a representation of the extracted message.
+
+        {'server': server, 'room': room, 'url': url, 'when': datetime,
+         'user': {'name': str, 'id': int}, 'msg': str, 'link': str}
+
+        The 'msg' member is the actual message; the 'link' is its permalink.
+        The 'server' and 'room' members are simply copied from the input.
+        The 'url' is the address of the transcript page we fetched and scraped.
         """
         for soup, url in self.fetch(server, room):
             title = soup.title.string
@@ -147,27 +154,50 @@ class Transcript:
                 raise TranscriptFrozenDeletedException(candidate)
         return False
 
-    def latest(self, room: int, server: str) -> dict:
+    def usercount(
+            self,
+            room: int,
+            server: str,
+            userlimit: int=1,
+            messagelimit: int=1,
+            skip_system_messages: bool=True
+    ):
         """
-        Fetch latest message from room on server. Return a dict of
-        {'server': server, 'room': room, 'url': url, 'when': datetime,
-         'user': {'name': str, 'id': int}, 'msg': str, 'link': str}
-        The 'msg' member is the actual message; the 'link' is its permalink.
-        The 'server' and 'room' members are simply copied from the input.
-        The 'url' is the address of the transcript page we fetched and scraped.
+        Fetch latest messages from room on server. Stop when the unique
+        user count reaches the limit, though always return at least as
+        many messages as specified by messagelimit, if available.
+        Optionally, skip system messages (where the user id < 0).
 
-        Skip any negative user id:s, as those are feed messages which do
-        not count as actual activity.
+        Return the sequence of messages as a list of dicts, newest first,
+        each as described in the `messages` method's docstring.
         """
         assert isinstance(room, int)
         room = int(room)
 
         self.check_frozen_or_deleted(server, room)
 
+        messages = []
+        users = set()
         for message in self.messages(server, room):
-            if message['user']['id'] < 0:
+            userid = message['user']['id']
+            if userid < 0 and skip_system_messages:
                 continue
-            return message
+            messages.append(message)
+            if userid not in users:
+                users.add(userid)
+            if len(users) >= userlimit and len(messages) >= messagelimit:
+                return messages
+            print(f"# {len(messages)} messages, {len(users)} users")
+
+    def latest(self, room: int, server: str) -> dict:
+        """
+        Fetch latest message from room on server. Return a dict like
+        the one produced by the `messages` method.
+
+        Skip any negative user id:s, as those are feed messages which do
+        not count as actual activity.
+        """
+        return self.usercount(room, server, userlimit=1, messagelimit=1)[0]
 
     def search(
             self, server: str, room: int, user: int, phrase: str

@@ -18,6 +18,11 @@ from requests.exceptions import RequestException
 from scrape_chat import Transcript, TranscriptFrozenDeletedException
 
 
+DEFAULT_MAX_AGE = {'days': 12}
+AGGRESSIVE_MAX_MSG_THRESHOLD = 15
+DEFAULT_AGGRESSIVE_MAX_AGE = {'days': 6}
+
+
 class SchemaError(Exception):
     pass
 
@@ -457,7 +462,9 @@ class Sloshy:
             else:
                 maxage = timedelta(self.config['threshold'])
         else:
-            maxage = timedelta(days=12)
+            maxage = timedelta(**DEFAULT_MAX_AGE)
+
+        max_aggressive_age = timedelta(**DEFAULT_AGGRESSIVE_MAX_AGE)
 
         fetcher = Transcript()
         homeroom = self.homeroom
@@ -487,7 +494,12 @@ class Sloshy:
                         room.escaped_name, room.transcript_url())
                 age = maxage + timedelta(days=1)
             self.log_notice(msg)
-            if age > maxage:
+            quiet = False
+            if age > max_aggressive_age:
+                quiet = fetcher.usercount(
+                    room.id, room.server, userlimit=2,
+                    messagelimit=AGGRESSIVE_MAX_MSG_THRESHOLD)
+            if age > maxage or (quiet and age > max_aggressive_age):
                 try:
                     self.notice(room)
                     self.log_notice(
