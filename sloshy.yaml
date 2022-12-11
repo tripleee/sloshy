@@ -121,4 +121,7 @@ servers:
     - contact: oleg-valter (15810379)
       name: "Userscript newbies and friends"
       id: 214345
+    - contact: tripleee (468289)
+      name: "test room for Sloshy PR #36"
+      id: 250328
     sloshy_id: 16115299
