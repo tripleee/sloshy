@@ -138,7 +138,7 @@ class Room:
         self.server = server
         self.id = id
         self.name = name
-        self.log_id = '%s/rooms/%i' % (server, id)
+        self.log_id = 'https://%s/rooms/%i' % (server, id)
         self.escaped_name = name.replace('[', '\[').replace(']', '\]')
         self.sloshy_id = sloshy_id
         self.clients = clients
