@@ -20,7 +20,7 @@ from scrape_chat import Transcript, TranscriptFrozenDeletedException
 
 DEFAULT_MAX_AGE = {'days': 12}
 AGGRESSIVE_MAX_MSG_THRESHOLD = 15
-DEFAULT_AGGRESSIVE_MAX_AGE = {'days': 6}
+DEFAULT_AGGRESSIVE_MAX_AGE = {'days': 5}
 
 
 class SchemaError(Exception):
