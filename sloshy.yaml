@@ -87,12 +87,6 @@ servers:
     - contact: user1271772 (1327177)
       name: "HNQ (Operations Research)"
       id: 140197
-    - contact: user1271772 (1327177)
-      name: "Signal processing: Post-Processing (main room)"
-      id: 1090
-    - contact: user1271772 (1327177)
-      name: "Signal processing: Toptica FFT"
-      id: 138629
     sloshy_id: 514718
   chat.stackoverflow.com:
     rooms:
@@ -127,7 +121,4 @@ servers:
     - contact: oleg-valter (15810379)
       name: "Userscript newbies and friends"
       id: 214345
-    - contact: user1271772 (1327177)
-      name: "Meta Python"
-      id: 202427  
     sloshy_id: 16115299
