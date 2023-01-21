@@ -15,11 +15,26 @@ to leave some leeway for possible accidents
 (the freeze happens after 14 days of inactivity).
 
 
-## Configuration
+## Configuring Sloshy
 
 There is no interactive interface to the bot;
-create a pull request if you would like to add a room
-to Sloshy's watch list.
+create a pull request
+if you would like to add a room to Sloshy's watch list.
+
+
+### Configuration File Format
+
+Sloshy's operation is driven by a simple YAML file,
+[`sloshy.yaml`](sloshy.yaml).
+
+This is basically a human-readable text file,
+though the YAML format imposes some structuring conventions
+to also ensure that the file is properly machine-readable.
+For more information, perhaps see
+[Wikipedia's YAML article](https://en.wikipedia.org/wiki/YAML)
+and/or https://yaml.org/;
+but you really don't need to be very familiar with the format
+to make simple changes.
 
 | :warning:      | Configuration file format changed in PR #23 |
 |----------------|:--------------------------------------------|
@@ -41,8 +56,11 @@ you want to add;
   followed by the network account id in round parentheses.
   The network id number can be found by clicking "Network profile"
   on any profile page for your account.
-  (For example, Sloshy is user 16115299 on Stack Overflow,
-  but network user 21818820.)
+  (For example, Sloshy is [user 16115299 on Stack Overflow][2],
+  but [network user 21818820][3].)
+
+ [2]: https://chat.stackoverflow.com/users/16115299/sloshy
+ [3]: https://stackexchange.com/users/21818820/sloshy
 
 In brief, if your chatroom's URL is
 https://chat.stackexchange.com/rooms/12345/my-room,
@@ -60,14 +78,53 @@ in the configuration file.
 (This is showing the complete YAML structure;
 the `servers` top-level key
 and the server `chat.stackexchange.com` with the corresponding `sloshy_id`
-obviously already exist in the file.)
-
-Please separately make sure that Sloshy has write access to
-any privileged room you want to add to the list.
+obviously already exist in the file.
+Thus the three lines starting from the `- contact:` line
+are what you would normally add for a new room.)
 
 Perhaps notice also that there are two main chat servers
 with very similar names,
 where one contains "overflow" and the other contains "exchange".
+You want to make sure you add the room in the section belonging
+to the correct server for this particular room.
+
+
+### Requesting a New Room or a Configuration Change
+
+The previous section explains what
+technically needs to go into your pull request.
+Creating the required code change for a pull request
+should be easy if you are familiar with the basics of
+[GitHub's PR process](https://docs.github.com/en/pull-requests)
+and YAML (or at the very least, making changes to a text file. :-)
+
+Before you propose a change,
+
+* Please make sure you have the approval of the room's users,
+  typically by asking a room owner or a moderator for approval.
+
+* Please also separately make sure that Sloshy has write access
+  to any privileged room you want to add to the list.
+
+For adding an individual room owned by yourself,
+the process is pretty relaxed; just say so in the description
+of the pull request which you fill in when you create it.
+(As always, including a good rationale for the change
+is considered good practice; pull requests with no information
+about the rationale and/or context can and will be rejected summarily,
+not just by the Sloshy maintainer, but more generally.)
+
+If you add more rooms (in a single pull request, or over time),
+getting moderator approval for individual rooms may not be sufficient.
+Then, it's probably better if you can anchor the decision with
+a discussion about the guiding motivation
+for adding these rooms to Sloshy's configuration
+(probably with a moderator;
+but if you can adequately poll the users of those rooms
+and other pertinent stakeholders
+e.g. with a meta post about this topic,
+and reach a reasonable consensus among them,
+that would probably be fine, too).
 
 
 ### Migrating Old Configurations
@@ -108,6 +165,7 @@ but the following are expected to remain stable and supported:
 ## Deploy
 
 There is a simple Github Action which runs nightly.
+Pushing a new version to the `master` branch deploys it.
 
 
 ## Bot Profiles
