@@ -14,6 +14,8 @@ The threshold is currently set to 12 days since the previous message,
 to leave some leeway for possible accidents
 (the freeze happens after 14 days of inactivity).
 
+(Actually, there is an [open bug](https://github.com/tripleee/sloshy/issues/36)
+which currently reduces the interval to 6 days.)
 
 ## Configuring Sloshy
 
