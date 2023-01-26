@@ -88,7 +88,7 @@ servers:
       name: "HNQ (Operations Research)"
       id: 140197
     - contact: peter-k (7274)
-      name: "Post-Processing"
+      name: "Signal Processing: Post-Processing"
       id: 1090     
     sloshy_id: 514718
   chat.stackoverflow.com:
