@@ -495,10 +495,11 @@ class Sloshy:
                 age = maxage + timedelta(days=1)
             self.log_notice(msg)
             quiet = False
-            if age > max_aggressive_age:
-                quiet = fetcher.usercount(
+            if age <= maxage and age > max_aggressive_age:
+                activity = fetcher.usercount(
                     room.id, room.server, userlimit=2,
                     messagelimit=AGGRESSIVE_MAX_MSG_THRESHOLD)
+                quiet = not activity
             if age > maxage or (quiet and age > max_aggressive_age):
                 try:
                     self.notice(room)

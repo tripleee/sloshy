@@ -169,7 +169,8 @@ class Transcript:
         Optionally, skip system messages (where the user id < 0).
 
         Return the sequence of messages as a list of dicts, newest first,
-        each as described in the `messages` method's docstring.
+        each as described in the `messages` method's docstring; or, if
+        the conditions could not be satisfied, return None.
         """
         assert isinstance(room, int)
         room = int(room)
@@ -184,10 +185,17 @@ class Transcript:
                 continue
             messages.append(message)
             if userid not in users:
+                logging.debug("found user %i", userid)
                 users.add(userid)
             if len(users) >= userlimit and len(messages) >= messagelimit:
+                logging.info(
+                    "went back to %s, got %i messages, %i users",
+                    message["url"], len(messages), len(users))
                 return messages
-            print(f"# {len(messages)} messages, {len(users)} users")
+        logging.warning(
+            "went back to %s, only found %i users, %i messages",
+            message["url"], len(messages), len(users))
+        return None
 
     def latest(self, room: int, server: str) -> dict:
         """
