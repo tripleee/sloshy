@@ -130,4 +130,7 @@ servers:
     - contact: user1271772 (1327177)
       name: "ElectionBot Development (SO)"
       id: 190503
+    - contact: thingamabobs (13629335)
+      name: "tkinter"
+      id: 249491
     sloshy_id: 16115299
