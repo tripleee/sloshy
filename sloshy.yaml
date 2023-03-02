@@ -127,4 +127,7 @@ servers:
     - contact: tripleee (468289)
       name: "Test room for PR #36, take 3 (!)"
       id: 251502
+    - contact: user1271772 (1327177)
+      name: "ElectionBot Development (SO)"
+      id: 190503
     sloshy_id: 16115299
