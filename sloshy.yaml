@@ -65,16 +65,16 @@ servers:
       name: 'Matter Modeling: Ask a Moderator'
     - contact: user1271772 (1327177)
       id: 109902
-      name: 'Matter Modeling: Tags (Discussion about tags on the main site)'
+      name: 'Matter Modeling: Announcements of user or site milestones achieved'
     - contact: user1271772 (1327177)
       id: 107328
-      name: 'Matter Modeling: ORCA software'
+      name: 'Matter Modeling: Tags (Discussion about tags on the main site)'
     - contact: user1271772 (1327177)
       id: 142409
-      name: 'Matter Modeling: SIESTA software'
+      name: 'Matter Modeling: ORCA software'
     - contact: user1271772 (1327177)
       id: 136776
-      name: 'Matter Modeling: Announcements of user or site milestones achieved'
+      name: 'Matter Modeling: SIESTA software'
     - contact: user1271772 (1327177)
       id: 107323
       name: 'Matter Modeling: General chat room'
