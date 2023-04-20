@@ -105,7 +105,6 @@ servers:
     - contact: user1271772 (1327177)
       name: "Operations Research: General"
       id: 94323
-      # temporarily added by tripleee; see discussion in Sloshy #44 on Github
     sloshy_id: 514718
   chat.stackoverflow.com:
     rooms:
