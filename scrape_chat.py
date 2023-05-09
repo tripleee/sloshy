@@ -70,7 +70,7 @@ class Transcript:
             if not prev:
                 break
             url = 'https://%s%s' % (server, prev['href'])
-            logging.info('No messages, falling back to %s', url)
+            logging.info('Fetch continues after sleep at %s', url)
             sleep(fallback_sleep)
 
     def messages(self, server: str, room: int) -> dict:
@@ -193,7 +193,7 @@ class Transcript:
                     message["url"], len(messages), len(users))
                 return messages
         logging.warning(
-            "went back to %s, only found %i users, %i messages",
+            "went back to %s, only found %i messages, %i users",
             message["url"], len(messages), len(users))
         return None
 

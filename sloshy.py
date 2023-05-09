@@ -504,8 +504,9 @@ class Sloshy:
                 try:
                     self.notice(room)
                     self.log_notice(
-                        '%s: Age threshold exceeded; sending a thawing notice'
-                        % room.escaped_name)
+                        '%s: Age threshold exceeded; sending a%s thawing notice'
+                        % (room.escaped_name,
+                            '' if age>maxage else 'n expedited'))
                 except ChatActionError as err:
                     self.log_error(
                         '%s: Age threshold exceeded, but failed to thaw: %s'
