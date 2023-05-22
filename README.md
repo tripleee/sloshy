@@ -12,7 +12,8 @@ and makes sure they are not frozen.
 
 The threshold is currently set to 12 days since the previous message,
 to leave some leeway for possible accidents
-(the freeze happens after 14 days of inactivity).
+(the freeze happens after 14 days of inactivity;
+the threshold is lower for rooms with only very few messages).
 
 
 ## Configuring Sloshy
@@ -44,11 +45,7 @@ to the `servers` key if it is missing (though that's unlikely)
 and create a new `rooms` entry with information about the room
 you want to add;
 
-* The `id` is the room's numeric identifier.
-  This (together with the server's name) is the way Sloshy finds the room.
-* The `name` field is just a display string for Sloshy's status messages.
-  It can be anything, but should describe the room
-  reasonably unambiguously to humans.
+* A line with a dash at the front starts a new entry.
 * The `contact` field indicates who requested the room to be added,
   in case we would need to touch base with you later on
   to assess whether the room still needs to be on the list, etc.
@@ -58,13 +55,19 @@ you want to add;
   on any profile page for your account.
   (For example, Sloshy is [user 16115299 on Stack Overflow][2],
   but [network user 21818820][3].)
+* The `id` is the room's numeric identifier.
+  This (together with the server's name) is the way Sloshy finds the room.
+* The `name` field is just a display string for Sloshy's status messages.
+  It can be anything, but should describe the room
+  reasonably unambiguously to humans.
 
  [2]: https://chat.stackoverflow.com/users/16115299/sloshy
  [3]: https://stackexchange.com/users/21818820/sloshy
 
 In brief, if your chatroom's URL is
 https://chat.stackexchange.com/rooms/12345/my-room,
-and your network account ID is 123456789, you would add
+and your network account ID is 123456789,
+the configuration file would look something like
 ```yaml
 servers:
  chat.stackexchange.com:
@@ -74,7 +77,7 @@ servers:
      name: "my room's name"
    sloshy_id: 514718
 ```
-in the configuration file.
+
 (This is showing the complete YAML structure;
 the `servers` top-level key
 and the server `chat.stackexchange.com` with the corresponding `sloshy_id`
@@ -128,6 +131,10 @@ that would probably be fine, too).
 
 
 ### Migrating Old Configurations
+
+(This is only relevant if you cloned Sloshy a long time ago,
+and need to update your configuration to adhere to the
+current YAML schema.)
 
 There is an option `--migrate` which accepts a YAML file argument
 and rewrites it from the old schema to the new.
