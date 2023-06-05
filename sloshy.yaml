@@ -109,10 +109,6 @@ servers:
   chat.stackoverflow.com:
     rooms:
     - contact: tripleee (468289)
-      id: 111347
-      name: SOBotics
-      role: home
-    - contact: tripleee (468289)
       id: 109494
       name: friendly bin
     - contact: user1271772 (1327177)
@@ -121,6 +117,7 @@ servers:
     - contact: tripleee (468289)
       id: 233626
       name: Sloshy the Thawman
+      role: home
     - contact: samcarter (3270911)
       id: 193903
       name: Duck Overflow
