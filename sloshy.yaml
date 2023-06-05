@@ -105,6 +105,9 @@ servers:
     - contact: user1271772 (1327177)
       name: "Operations Research: General"
       id: 94323
+    - contact: gparyani (2477436)
+      name: "The Terminal"
+      id: 84778
     sloshy_id: 514718
   chat.stackoverflow.com:
     rooms:
