@@ -139,9 +139,6 @@ servers:
     - contact: oleg-valter (15810379)
       name: "[dev] SpotDetector"
       id: 244392
-    - contact: oleg-valter (15810379)
-      name: "Userscript newbies and friends"
-      id: 214345
     - contact: user1271772 (1327177)
       name: "ElectionBot Development (SO)"
       id: 190503
