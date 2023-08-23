@@ -157,4 +157,10 @@ servers:
     - contact: M-- (8629256)
       name: "R Language Collective"
       id: 252171
+    - contact: Andras Deak (6553924)
+      name: "Python Ouroboros - The Rotating Knives"
+      id: 71097
+    - contact: Andras Deak (6553924)
+      name: "MetaPython"
+      id: 202427
     sloshy_id: 16115299
