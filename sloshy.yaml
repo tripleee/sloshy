@@ -1,4 +1,4 @@
-schema: 20211215
+schema: 20230827
 servers:
   chat.stackexchange.com:
     rooms:
@@ -111,6 +111,10 @@ servers:
     sloshy_id: 514718
   chat.stackoverflow.com:
     rooms:
+    - contact: tripleee (468289)
+      id: 111347
+      name: SOBotics
+      role: cc
     - contact: tripleee (468289)
       id: 109494
       name: friendly bin

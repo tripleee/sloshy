@@ -158,7 +158,7 @@ for use in internal testing,
 but the following are expected to remain stable and supported:
 
 * `schema`: top-level key which identifies the YAML schema version
-  (currently 20211215, corresponding to the date 2021-12-15).
+  (currently 20230827, corresponding to the date 2023-08-27).
 * `local`: boolean; set to `true` to disable connecting to chat.
   Sloshy will still need to open network connections
   to fetch chat transcripts, but will not emit any chat messages.
@@ -168,6 +168,13 @@ but the following are expected to remain stable and supported:
   to emit an anti-freeze message to a room.
   The default is 12 days; set to a different number to override.
   (See the source for advanced and possibly unstable options.)
+
+### Schema Changes
+
+* 20230827: add "role: cc"
+* 20211215: first schema with a version number; split into
+  top-level servers and include Sloshy's chat ID for each
+  in preparation for the `--announce` feature.
 
 ## Deploy
 
