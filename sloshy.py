@@ -144,6 +144,7 @@ class Room:
         self.clients = clients
 
         self.homeroom = False
+        self.ccroom = False
 
         self._chatroom = None
 
@@ -152,6 +153,12 @@ class Room:
 
     def is_home_room(self) -> bool:
         return self.homeroom
+
+    def set_as_cc_room(self):
+        self.ccroom = True
+
+    def is_cc_room(self):
+        return self.ccroom
 
     def transcript_url(self) -> str:
         return 'https://%s/transcript/%i' % (self.server, self.id)
@@ -183,6 +190,8 @@ class Sloshy:
 
         self.rooms = []
         self.homeroom = None
+        self.ccrooms = []
+
         self.chatclients = None
         self.email = ''
         self.password = ''
@@ -212,7 +221,7 @@ class Sloshy:
             warning = 'Config file does not contain key "schema". ' \
                 ' Run with --migrate?'
 
-        if config['schema'] != 20211215:
+        if config['schema'] != 20230827:
             warning = 'Config file uses old schema %i; run with --migrate?' % (
                 config['schema'])
 
@@ -225,6 +234,7 @@ class Sloshy:
         self.config = config
         self.rooms = []
         self.homeroom = None
+        self.ccrooms = []
 
         if not self.local and 'local' in config:
             self.local = bool(config['local'])
@@ -255,10 +265,14 @@ class Sloshy:
                 roomobj = Room(
                     server, room['id'], room['name'], sloshy_id, clients)
                 self.rooms.append(roomobj)
-                if 'role' in room and room['role'] == 'home':
-                    assert self.homeroom is None
-                    self.homeroom = roomobj
-                    roomobj.set_as_home_room()
+                if 'role' in room:
+                    if room['role'] == 'home':
+                        assert self.homeroom is None
+                        self.homeroom = roomobj
+                        roomobj.set_as_home_room()
+                    elif room['role'] == 'cc':
+                        roomobj.set_as_cc_room()
+                        self.ccrooms.append(roomobj)
         assert self.homeroom is not None
 
         if 'auth' in config:
@@ -342,15 +356,21 @@ class Sloshy:
         """
         self.send_chat_message(room, self.generate_chat_message())
 
-    def log_notice(self, message: str, log_emit=logging.info):
+    def log_notice(self, message: str, log_emit=logging.info, cc: bool = False):
         """
-        Emit a log message to the home room, and as a warning
+        Emit a log message to the home room, and as a warning.
+        With cc=True, also emit to cc room(s).
         """
         log_emit(message)
         self.send_chat_message(self.homeroom, message)
+        if cc:
+            for ccroom in self.ccrooms:
+                self.send_chat_message(ccroom, message)
 
-    log_warn = lambda self, x: self.log_notice(x, log_emit=logging.warning)
-    log_error = lambda self, x: self.log_notice(x, log_emit=logging.error)
+        log_warn = lambda self, x, cc=False: self.log_notice(
+            x, log_emit=logging.warning, cc=True)
+        log_error = lambda self, x, cc=False: self.log_notice(
+            x, log_emit=logging.error, cc=True)
 
     def test_rooms(self, announce=None):
         """
@@ -428,7 +448,7 @@ class Sloshy:
                     counter['fail'].add(room.log_id)
                     continue
                 self.log_notice(
-                    'announced presence in %s' % room.log_id)
+                    'announced presence in %s' % room.log_id, cc=True)
         if announce is None:
             self.log_notice(
                 'scanned %i rooms on %i servers' % (
@@ -506,7 +526,7 @@ class Sloshy:
                     self.log_notice(
                         '%s: Age threshold exceeded; sending a%s thawing notice'
                         % (room.escaped_name,
-                            '' if age>maxage else 'n expedited'))
+                            '' if age>maxage else 'n expedited'), cc=True)
                 except ChatActionError as err:
                     self.log_error(
                         '%s: Age threshold exceeded, but failed to thaw: %s'
@@ -536,6 +556,11 @@ class SloshyLegacyConfig20211215(Sloshy):
     """
     Child class with the original configuration file processing
     and a migration method for updating to the new format.
+
+    This actually now returns the 20230827 schema but the only
+    difference is the support for "role: cc" which simply didn't
+    exist in the earlier schemas, so we do not write it anywhere
+    when migrating.
     """
     def load_conf(self, conffile=None):
         """
@@ -615,7 +640,7 @@ class SloshyLegacyConfig20211215(Sloshy):
                     'rooms': serverdict[server]
                 }
 
-        return {'schema': 20211215, 'servers': serverconfigs}
+        return {'schema': 20230827, 'servers': serverconfigs}
 
 
 def main():
