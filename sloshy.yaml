@@ -98,10 +98,7 @@ servers:
       id: 140197
     - contact: peter-k (7274)
       name: "Signal Processing: Post-Processing"
-      id: 1090     
-    - contact: user1271772 (1327177)
-      name: "Chemistry: Downvoting"
-      id: 138453
+      id: 1090
     - contact: user1271772 (1327177)
       name: "Operations Research: General"
       id: 94323
