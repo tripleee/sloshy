@@ -82,9 +82,6 @@ servers:
       id: 109797
       name: 'Matter Modeling: Q-Chem software'
     - contact: user1271772 (1327177)
-      id: 104555
-      name: 'Area 51: Matter Modeling Proposal'
-    - contact: user1271772 (1327177)
       id: 111122
       name: Physics questions at MMSE
     - contact: oleg-valter (15810379)
