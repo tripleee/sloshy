@@ -105,6 +105,9 @@ servers:
     - contact: Pet Linux (28115049)
       name: "AI stuff"
       id: 146039
+    - contact: tripleee (468289)
+      name: Area 51
+      id: 241
     sloshy_id: 514718
   chat.stackoverflow.com:
     rooms:
