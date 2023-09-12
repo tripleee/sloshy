@@ -167,4 +167,7 @@ servers:
     - contact: Andras Deak (6553924)
       name: "MetaPython"
       id: 202427
+    - contact: tripleee (468289)
+      name: "#!/bin/bash"
+      id: 98569
     sloshy_id: 16115299
