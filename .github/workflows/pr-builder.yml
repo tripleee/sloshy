@@ -16,9 +16,6 @@ jobs:
   pr-generator:
     runs-on: ubuntu-latest
 
-    env:
-      branch: branch-${{ github.run_id }}-${{ github.run_attempt }}
-
     steps:
     - name: Show GitHub context
       env:
@@ -27,6 +24,8 @@ jobs:
     - name: Check out sources
       uses: actions/checkout@v4
     - name: Create branch and commit for PR
+      env:
+        branch: branch-${{ github.run_id }}-${{ github.run_attempt }}
       run:
         git checkout -b "$branch"
         echo poo >sloshy.yaml
