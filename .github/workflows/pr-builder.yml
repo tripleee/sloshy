@@ -1,0 +1,52 @@
+name: PR Builder
+
+on:
+  workflow_dispatch:
+    inputs:
+      chatroom-url:
+        description: >
+          URL of the chatroom you want to add to Sloshy's configuration
+        required: true
+      chatroom-desc:
+        description: Description of the room
+        required: true
+      user-url:
+        description: >
+          Your Stack Exchange user profile URL
+        required: true
+      user-nick:
+        description: >
+          The user name for yourself you would like to have included in the code
+
+jobs:
+  pr-generator:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+    - name: Check out sources
+      uses: actions/checkout@v4
+    - name: Make the requested changes
+      run: |
+        python3 pr-builder.py '${{ github.event.inputs.chatroom-url}}' \
+            '${{ github.event.inputs.chatroom-desc}}' \
+            '${{ github.event.inputs.user-url}}' \
+            '${{ github.event.inputs.user-nick}}'
+    - name: Create PR
+      uses: peter-evans/create-pull-request@v5
+      with:
+        add-paths:
+          sloshy.yaml
+        commit-message: |
+          ${{ github.actor }}: add ${{ github.event.inputs.chatroom-desc }}
+
+          PR builder: new entry for ${{ github.event.inputs.chatroom-url }}
+        title: >
+          ${{ github.actor }}: add ${{ github.event.inputs.chatroom-desc }}
+        body: >
+          PR builder: new entry for ${{ github.event.inputs.chatroom-url }}
+        branch: pr-builder-${{ github.run_id }}-${{ github.run_attempt }}
+        delete-branch: true
