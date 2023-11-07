@@ -1,0 +1,35 @@
+name: PR Builder
+
+on:
+  workflow_dispatch:
+    inputs:
+      chatroom-url:
+        description: >
+          URL of the chatroom you want to add to Sloshy's configuration
+        required: true
+      user-url:
+        descrioption: >
+          Your Stack Exchange user profile URL
+        required: true
+
+jobs:
+  pr-generator:
+    runs-on: ubuntu-latest
+
+    env:
+      branch: branch-${{ github.run_id }}-${{ github.run_attempt }}
+
+    steps:
+    - name: Check out sources
+      uses: actions/checkout@v4
+    - name: Create branch and commit for PR
+      run:
+        git checkout -b "$branch"
+        echo poo >sloshy.yaml
+        git add sloshy.yaml
+        echo "${{github.actor}}: add ${{ github.events.inputs.chatroom-url }}" >commit
+        echo "Request by ${{github.events.inputs.user-url}}" >>commit
+        git commit -F commit
+    - name: Create PR
+      run:
+        gh pr create -B master --fill
