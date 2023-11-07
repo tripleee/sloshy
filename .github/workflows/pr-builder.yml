@@ -20,6 +20,10 @@ jobs:
       branch: branch-${{ github.run_id }}-${{ github.run_attempt }}
 
     steps:
+    - name: Show GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
     - name: Check out sources
       uses: actions/checkout@v4
     - name: Create branch and commit for PR
@@ -27,7 +31,6 @@ jobs:
         git checkout -b "$branch"
         echo poo >sloshy.yaml
         git add sloshy.yaml
-        echo "${{github.actor}}: add ${{ github.events.inputs.chatroom-url }}" >commit
         echo "Request by ${{github.events.inputs.user-url}}" >>commit
         git commit -F commit
     - name: Create PR
