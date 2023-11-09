@@ -170,4 +170,7 @@ servers:
     - contact: tripleee (468289)
       id: 98569
       name: '#!/bin/bash'
+    - contact: tripleee (468289)
+      id: 41570
+      name: SOCVR
     sloshy_id: 16115299
