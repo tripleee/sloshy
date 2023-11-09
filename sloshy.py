@@ -281,6 +281,17 @@ class Sloshy:
             # Gripe a bit, we don't want users to embed authnz in the file
             logging.warning('Chat username and password read from config')
 
+    def write_conf(self, config=None):
+        """
+        Write Sloshy's configuration, or the specified configuration,
+        to self.conffile as YAML.
+        """
+        if config is None:
+            config = self.config
+
+        with open(self.conffile, 'w', encoding='utf-8') as newconf:
+            yaml.dump(config, newconf)
+
     def migrate(self):
         """
         Rewrite older-format configuration file using new YAML schema.
@@ -288,9 +299,7 @@ class Sloshy:
         The meat is in the migrated_config method which reads the old
         config and returns the new format.
         """
-        updated_config = self.migrated_config()
-        with open(self.conffile, 'w', encoding='utf-8') as newconf:
-            yaml.dump(updated_config, newconf)
+        self.write_conf(self.migrated_config())
 
     def migrated_config(self):
         """
@@ -382,7 +391,6 @@ class Sloshy:
         Otherwise, check if Sloshy has already has posted a message to
         each room in turn; if we have, regard it as tested. If not,
         attempt to write the announcement message to the room in question.
-
         """
         fetcher = Transcript()
         counter = {'server': set(), 'id': set(), 'fail': set()}
