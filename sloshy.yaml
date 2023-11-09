@@ -86,28 +86,28 @@ servers:
       name: Physics questions at MMSE
     - contact: oleg-valter (15810379)
       id: 92073
-      name: "Room for testing ElectionBot on *.stackexchange.com elections"
+      name: Room for testing ElectionBot on *.stackexchange.com elections
     - contact: Nic (64473)
-      name: "Sustainable Living"
       id: 7310
+      name: Sustainable Living
     - contact: user1271772 (1327177)
-      name: "HNQ (Operations Research)"
       id: 140197
+      name: HNQ (Operations Research)
     - contact: peter-k (7274)
-      name: "Signal Processing: Post-Processing"
       id: 1090
+      name: 'Signal Processing: Post-Processing'
     - contact: user1271772 (1327177)
-      name: "Operations Research: General"
       id: 94323
+      name: 'Operations Research: General'
     - contact: gparyani (2477436)
-      name: "The Terminal"
       id: 84778
+      name: The Terminal
     - contact: Pet Linux (28115049)
-      name: "AI stuff"
       id: 146039
+      name: AI stuff
     - contact: tripleee (468289)
-      name: Area 51
       id: 241
+      name: Area 51
     sloshy_id: 514718
   chat.stackoverflow.com:
     rooms:
@@ -135,39 +135,39 @@ servers:
       id: 217630
       name: Google Apps Script chat community
     - contact: oleg-valter (15810379)
-      name: "V-eye"
       id: 240030
+      name: V-eye
     - contact: oleg-valter (15810379)
-      name: "[dev] SpotDetector"
       id: 244392
+      name: '[dev] SpotDetector'
     - contact: vlaz (4541793)
-      name: "Userscript newbies and friends"
       id: 214345
+      name: Userscript newbies and friends
     - contact: user1271772 (1327177)
-      name: "ElectionBot Development (SO)"
       id: 190503
+      name: ElectionBot Development (SO)
     - contact: nordine-lotfi (17067343)
-      name: "tkinter"
       id: 249491
+      name: tkinter
     - contact: Andreas detests censorship (9998366)
-      name: "CV-PLS old questions"
       id: 253110
+      name: CV-PLS old questions
     - contact: Andreas detests censorship (9998366)
-      name: "CV-PLS OQ requests graveyard"
       id: 253305
+      name: CV-PLS OQ requests graveyard
     - contact: Andreas detests censorship (9998366)
-      name: "CV-PLS OQ /dev/null"
       id: 253387
+      name: CV-PLS OQ /dev/null
     - contact: M-- (8629256)
-      name: "R Language Collective"
       id: 252171
+      name: R Language Collective
     - contact: Andras Deak (6553924)
-      name: "Python Ouroboros - The Rotating Knives"
       id: 71097
+      name: Python Ouroboros - The Rotating Knives
     - contact: Andras Deak (6553924)
-      name: "MetaPython"
       id: 202427
+      name: MetaPython
     - contact: tripleee (468289)
-      name: "#!/bin/bash"
       id: 98569
+      name: '#!/bin/bash'
     sloshy_id: 16115299
