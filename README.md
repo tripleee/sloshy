@@ -23,17 +23,6 @@ create a pull request
 if you would like to add a room to Sloshy's watch list.
 
 
-### Interactive PR builder
-
-There is a [simple interactive PR builder][4]
-but the user interface is quite barren.
-In brief, you have to be logged in to Github
-and click the "Run workflow" dropdown,
-then fill in the details about the room you want to add.
-
- [4]: https://github.com/tripleee/sloshy/actions/workflows/pr-builder.yml
-
-
 ### Configuration File Format
 
 Sloshy's operation is driven by a simple YAML file,
