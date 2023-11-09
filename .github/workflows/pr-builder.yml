@@ -30,6 +30,9 @@ jobs:
     - name: Check out sources
       uses: actions/checkout@v4
     - name: Make the requested changes
+      env:
+        SLOSHY_EMAIL: ${{secrets.SLOSHY_EMAIL}}
+        SLOSHY_PASSWORD: ${{secrets.SLOSHY_PASSWORD}}
       run: |
         pip3 install -r requirements.txt
         python3 pr-builder.py '${{ github.event.inputs.chatroom-url}}' \
