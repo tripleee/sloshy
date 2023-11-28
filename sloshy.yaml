@@ -108,6 +108,9 @@ servers:
     - contact: tripleee (468289)
       id: 241
       name: Area 51
+    - contact: gparyani (78973)
+      id: 591
+      name: 'You Are Here'
     sloshy_id: 514718
   chat.stackoverflow.com:
     rooms:
