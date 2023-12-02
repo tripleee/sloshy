@@ -132,9 +132,10 @@ that would probably be fine, too).
 
 ### Migrating Old Configurations
 
-(This is only relevant if you cloned Sloshy a long time ago,
+This is only relevant if you cloned Sloshy's Git ropository
+a long time ago,
 and need to update your configuration to adhere to the
-current YAML schema.)
+current YAML schema.
 
 There is an option `--migrate` which accepts a YAML file argument
 and rewrites it from the old schema to the new.
@@ -145,7 +146,7 @@ Example:
 python3 sloshy.py --migrate sloshy.yaml
 ```
 
-The old configuration file format did not have a schema identifier.
+The original configuration file format did not have a schema identifier.
 The migration code simply assumes that your file uses the old schema.
 
 
@@ -167,7 +168,8 @@ but the following are expected to remain stable and supported:
 * `threshold`: expression indicating after how much inactivity
   to emit an anti-freeze message to a room.
   The default is 12 days; set to a different number to override.
-  (See the source for advanced and possibly unstable options.)
+
+(See the source for advanced and possibly unstable options.)
 
 ### Schema Changes
 
@@ -187,6 +189,9 @@ Pushing a new version to the `master` branch deploys it.
 * [Main profile](https://stackoverflow.com/users/16115299/sloshy)
 * [Chat profile](https://chat.stackoverflow.com/users/16115299/sloshy)
 
+From the chat profile, you can see
+links to Sloshy's recent activities
+in different chat rooms.
 
 ## Author
 
