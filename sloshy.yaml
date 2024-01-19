@@ -173,4 +173,7 @@ servers:
     - contact: tripleee (468289)
       id: 98569
       name: '#!/bin/bash'
+    - contact: vlaz (4541793)
+      id: 208985
+      name: Bad Stack Overflow Reviews
     sloshy_id: 16115299
