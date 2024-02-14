@@ -17,7 +17,9 @@ jobs:
         env:
           SLOSHY_EMAIL: ${{secrets.SLOSHY_EMAIL}}
           SLOSHY_PASSWORD: ${{secrets.SLOSHY_PASSWORD}}
+          SLOSHY_HEALTHCHECK_UUID: ${{secrets.SLOSHY_HEALTHCHECK_UUID}}
         run: |
           pip3 install --upgrade pip setuptools wheel
           pip3 install -r requirements.txt
           python3 ./run.py
+          curl https://hc-ping.com/${SLOSHY_HEALTHCHECK_UUID}

@@ -2,9 +2,10 @@
 
 
 ![Build status badge][1]
+![Healthckecks.io status][4]
 
   [1]: https://github.com/tripleee/sloshy/actions/workflows/test-pushed.yml/badge.svg
-
+  [4]: https://healthchecks.io/badge/1c6e4a7e-e3ba-4ea6-bd6a-4a7ba6/Dc19IJOD-2.svg
 
 This is a simple Stack Overflow / Stack Exchange chat bot
 which keeps an eye on a selected list of rooms,
@@ -128,6 +129,9 @@ and other pertinent stakeholders
 e.g. with a meta post about this topic,
 and reach a reasonable consensus among them,
 that would probably be fine, too).
+
+If you think this is too old-school, perhaps check out
+[the competition.](https://toasty.ginger.rto.community/)
 
 
 ### Migrating Old Configurations
