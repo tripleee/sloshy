@@ -22,4 +22,6 @@ jobs:
           pip3 install --upgrade pip setuptools wheel
           pip3 install -r requirements.txt
           python3 ./run.py
-          curl https://hc-ping.com/${SLOSHY_HEALTHCHECK_UUID}
+          echo '** Running healthchecks.io ping'
+          curl -s https://hc-ping.com/${SLOSHY_HEALTHCHECK_UUID}
+          echo Done.
