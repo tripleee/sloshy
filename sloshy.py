@@ -101,7 +101,7 @@ class Chatclients:
             if self.local:
                 client = LocalClient(site)
             else:
-                rep_check = self.perform_rep_check()
+                # rep_check = self.perform_rep_check()
                 client = ChExClient(site)
             client.login(self.email, self.password)
             self.servers[server] = client
