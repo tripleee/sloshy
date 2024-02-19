@@ -15,7 +15,7 @@ import yaml
 from chatexchange.client import Client as ChExClient, ChatActionError
 from requests.exceptions import RequestException
 
-from scrape_chat import Transcript, TranscriptFrozenDeletedException
+from scrape_chat import Transcript, TranscriptFrozenDeletedException, RepScrape
 
 
 DEFAULT_MAX_AGE = {'days': 12}
@@ -85,6 +85,7 @@ class Chatclients:
         self.email = None
         self.password = None
         self.local = local
+        self.rep_check = None
 
     def authnz(self, email: str, password: str):
         self.email = email
@@ -100,10 +101,21 @@ class Chatclients:
             if self.local:
                 client = LocalClient(site)
             else:
+                rep_check = self.perform_rep_check()
                 client = ChExClient(site)
             client.login(self.email, self.password)
             self.servers[server] = client
         return self.servers[server]
+
+    def perform_rep_check(self) -> None:
+        """
+        Fetch Sloshy's network profile page's accounts tab
+        and check that relevant accounts have enough reputation
+        points to participate in chat (requires 30 rep).
+        """
+        if self.rep_check is not None:
+            return None
+        self.rep_check = RepScrape(21818820)
 
     def logout(self):
         """
