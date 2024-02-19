@@ -6,7 +6,7 @@ from datetime import datetime
 from time import sleep
 import platform
 import logging
-from typing import Optional
+from typing import Optional, Union
 
 import requests
 from bs4 import BeautifulSoup
@@ -26,14 +26,12 @@ class TranscriptFrozenDeletedException(TranscriptException):
     ...
 
 
-class Transcript:
-    """
-    Simple wrapper for fetching the transcript of a room.
-    """
-    UA = "SloshyBot/0.1 (+%s) Python/%s Requests/%s" % (
-        "https://github.com/tripleee/sloshy",
-        platform.python_version(),
-        requests.__version__)
+class SloshyClient:
+    def __init__(self):
+        self.UA = "SloshyBot/0.1 (+%s) Python/%s Requests/%s" % (
+            "https://github.com/tripleee/sloshy",
+            platform.python_version(),
+            requests.__version__)
 
     def _get_requests_soup(self, url: str) -> BeautifulSoup:
         """
@@ -44,6 +42,11 @@ class Transcript:
         result.raise_for_status()
         return BeautifulSoup(result.text, 'html.parser')
 
+
+class Transcript(SloshyClient):
+    """
+    Simple wrapper for fetching the transcript of a room.
+    """
     def fetch(
             self, server: str, room: int,
             fallback_sleep: int = 1
@@ -225,6 +228,41 @@ class Transcript:
             return None
         messages = content.find("div", {"class": "messages"})
         return 'https://%s%s' % (server, messages.find("a")['href'])
+
+
+class RepScrapeException(Exception):
+    """
+    Exception for RepScrape failure
+    """
+    ...
+
+
+class RepScrape(SloshyClient):
+    def __init__(self, user: Union[int, str]):
+        super().__init__()
+        url = f"https://stackexchange.com/users/{user}/sloshy?tab=accounts"
+        soup = self._get_requests_soup(url)
+        accounts = soup.body.find_all("div", {"class": "account-container"})
+        sites = {}
+        sitemax = {}
+        for account in accounts:
+            site = account.find(
+                "div", {"class": "account-site"}).h2.a['href'].split('/')[2]
+            score = int(account.find("span", {"class": "account-number"}).text)
+            sites[site] = score
+            logging.debug("found site %s: score %i", site, score)
+            topsite = ".".join(site.split(".")[-2:])
+            if topsite not in sitemax or sitemax[topsite] < score:
+                sitemax[topsite] = score
+                logging.debug("max for %s: %i", topsite, score)
+        # Store attributes for debugging
+        self.soup = soup
+        self.sitemax = sitemax
+        self.sites = sites
+        for site in sitemax:
+            if sitemax[site] < 30:
+                raise RepScrapeException(
+                    f"site {site} has score {sitemax[site]} < 30")
 
 
 def main():
