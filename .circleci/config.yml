@@ -34,7 +34,7 @@ jobs:
       - run:
           name: Run tests
           # This assumes pytest is installed via the install-package step above
-          command: python3 ./run.py && curl -s https://hc-ping.com/${SLOSHY_HEALTHCHECK_UUID}
+          command: python3 ./run.py "nightly secondary" && curl -s https://hc-ping.com/${SLOSHY_HEALTHCHECK_UUID}
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/workflows/ & https://circleci.com/docs/configuration-reference/#workflows
