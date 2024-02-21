@@ -559,7 +559,7 @@ class Sloshy:
 
     def perform_scan(self, startup_message=None):
         """
-        Entry point for a single scan: Perform room scan, then logout().
+        Entry point for a full scan: Perform room scan, then logout().
 
         If startup_message is given, provide this as the identifying message
         for Sloshy.
@@ -678,6 +678,9 @@ def main():
         '--test-rooms', action='store_true',
         help='Test access to rooms without announcing presence, then exit.')
     parser.add_argument(
+        '--local', action='store_true',
+        help='Run locally; do not emit chat messages.')
+    parser.add_argument(
         '--loglevel', default='info',
         help='Logging level: debug, info (default), warning, error')
     parser.add_argument(
@@ -703,8 +706,11 @@ def main():
         exit(0)
 
     conffile = args.conffile or "test.yaml"
-    me = Sloshy(conffile)
+    me = Sloshy(conffile, local=args.local)
     if args.announce or args.test_rooms:
+        if args.local:
+            raise ValueError(
+                '--local is incompatible with --announce and --test-rooms')
         if args.announce and args.test_rooms:
             raise ValueError(
                 '--announce and --test-rooms are mutually exclusive')
