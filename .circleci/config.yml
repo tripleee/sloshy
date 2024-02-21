@@ -43,7 +43,7 @@ jobs:
           # pip-dependency-file: test-requirements.txt  # if you have a different name for your requirements file, maybe one that combines your runtime and test requirements.
       - run:
           name: Run tests
-          # This assumes pytest is installed via the install-package step above
+          no_output_timeout: 30m
           command: |
             python3 ./run.py --circle-ci
             curl -s https://hc-ping.com/${SLOSHY_HEALTHCHECK_UUID}
