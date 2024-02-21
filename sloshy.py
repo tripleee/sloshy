@@ -664,19 +664,53 @@ class SloshyLegacyConfig20211215(Sloshy):
 
 
 def main():
-    from sys import argv
-    logging.basicConfig(level=logging.INFO)
+    from argparse import ArgumentParser
 
-    if len(argv) > 1 and argv[1] == '--migrate':
-        SloshyLegacyConfig20211215(
-            argv[2] if len(argv) > 2 else "sloshy.yaml").migrate()
+    parser = ArgumentParser()
+    parser.add_argument(
+        '--migrate', action='store_true',
+        help='Migrate config from old schema to the current one, then exit.')
+    parser.add_argument(
+        '--announce',
+        help='Announce presence in any rooms where Sloshy has not appeared,'
+            ' then exit. Requires announcement string as argument.')
+    parser.add_argument(
+        '--test-rooms', action='store_true',
+        help='Test access to rooms without announcing presence, then exit.')
+    parser.add_argument(
+        '--loglevel', default='info',
+        help='Logging level: debug, info (default), warning, error')
+    parser.add_argument(
+        'conffile', nargs='?', default='',
+        help='Configuration file for Sloshy. Default is sloshy.yaml for'
+            ' regular run, test.yaml for --test-rooms')
+    parser.add_argument(
+        'startup_message', nargs='?', default=None,
+        help='Message to display in the home room when starting up'
+            ' (default: "manual run").')
+
+    args = parser.parse_args()
+
+    logging.basicConfig(level={
+        "debug": logging.DEBUG,
+        "info": logging.INFO,
+        "warn": logging.WARNING,
+        "error": logging.ERROR
+        }[args.loglevel])
+
+    if args.migrate:
+        SloshyLegacyConfig20211215(args.conffile or "sloshy.yaml").migrate()
         exit(0)
 
-    me = Sloshy(argv[1] if len(argv) > 1 else "test.yaml")
-    if len(argv) > 2 and argv[2] in ('--announce', '--test-rooms'):
-        me.test_rooms(argv[3] if len(argv) > 3 else None)
+    conffile = args.conffile or "test.yaml"
+    me = Sloshy(conffile)
+    if args.announce or args.test_rooms:
+        if args.announce and args.test_rooms:
+            raise ValueError(
+                '--announce and --test-rooms are mutually exclusive')
+        me.test_rooms(args.announce)
     else:
-        me.perform_scan(argv[2] if len(argv) > 2 else None)
+        me.perform_scan(args.startup_message)
 
 
 if __name__ == '__main__':
