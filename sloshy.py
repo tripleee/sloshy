@@ -191,14 +191,17 @@ class Room:
 
 
 class Sloshy:
-    def __init__(self, conffile=None, local=False):
+    def __init__(self, conffile=None, local=False, verbose=False):
         """
         Create a Sloshy instance by parsing the supplied YAML file.
 
         With local=True, don't connect to chat rooms.
+
+        With verbose=True, emit room status messages on standard output.
         """
         self.conffile = conffile
         self.local = local
+        self.verbose = verbose
 
         self.rooms = []
         self.homeroom = None
@@ -384,13 +387,15 @@ class Sloshy:
         """
         log_emit(message)
         self.send_chat_message(self.homeroom, message)
+        if self.verbose:
+            print(str(datetime.utcnow()), message)
         if cc:
             for ccroom in self.ccrooms:
                 self.send_chat_message(ccroom, message)
 
-        log_warn = lambda self, x, cc=False: self.log_notice(
+    log_warn = lambda self, x, cc=False: self.log_notice(
             x, log_emit=logging.warning, cc=True)
-        log_error = lambda self, x, cc=False: self.log_notice(
+    log_error = lambda self, x, cc=False: self.log_notice(
             x, log_emit=logging.error, cc=True)
 
     def test_rooms(self, announce=None):
@@ -681,6 +686,9 @@ def main():
         '--local', action='store_true',
         help='Run locally; do not emit chat messages.')
     parser.add_argument(
+        '--verbose', action='store_true',
+        help='Emit room status messages on standard output.')
+    parser.add_argument(
         '--loglevel', default='info',
         help='Logging level: debug, info (default), warning, error')
     parser.add_argument(
@@ -706,7 +714,7 @@ def main():
         exit(0)
 
     conffile = args.conffile or "test.yaml"
-    me = Sloshy(conffile, local=args.local)
+    me = Sloshy(conffile, local=args.local, verbose=args.verbose)
     if args.announce or args.test_rooms:
         if args.local:
             raise ValueError(
