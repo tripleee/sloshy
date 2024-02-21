@@ -101,7 +101,7 @@ class Chatclients:
             if self.local:
                 client = LocalClient(site)
             else:
-                rep_check = self.perform_rep_check()
+                self.rep_check = self.perform_rep_check()
                 client = ChExClient(site)
             client.login(self.email, self.password)
             self.servers[server] = client
@@ -151,7 +151,7 @@ class Room:
         self.id = id
         self.name = name
         self.log_id = 'https://%s/rooms/%i' % (server, id)
-        self.escaped_name = name.replace('[', '\[').replace(']', '\]')
+        self.escaped_name = name.replace('[', r'\[').replace(']', r'\]')
         self.sloshy_id = sloshy_id
         self.clients = clients
 
@@ -191,14 +191,17 @@ class Room:
 
 
 class Sloshy:
-    def __init__(self, conffile=None, local=False):
+    def __init__(self, conffile=None, local=False, verbose=False):
         """
         Create a Sloshy instance by parsing the supplied YAML file.
 
         With local=True, don't connect to chat rooms.
+
+        With verbose=True, emit room status messages on standard output.
         """
         self.conffile = conffile
         self.local = local
+        self.verbose = verbose
 
         self.rooms = []
         self.homeroom = None
@@ -384,13 +387,15 @@ class Sloshy:
         """
         log_emit(message)
         self.send_chat_message(self.homeroom, message)
+        if self.verbose:
+            print(str(datetime.utcnow()), message)
         if cc:
             for ccroom in self.ccrooms:
                 self.send_chat_message(ccroom, message)
 
-        log_warn = lambda self, x, cc=False: self.log_notice(
+    log_warn = lambda self, x, cc=False: self.log_notice(
             x, log_emit=logging.warning, cc=True)
-        log_error = lambda self, x, cc=False: self.log_notice(
+    log_error = lambda self, x, cc=False: self.log_notice(
             x, log_emit=logging.error, cc=True)
 
     def test_rooms(self, announce=None):
@@ -559,7 +564,7 @@ class Sloshy:
 
     def perform_scan(self, startup_message=None):
         """
-        Entry point for a single scan: Perform room scan, then logout().
+        Entry point for a full scan: Perform room scan, then logout().
 
         If startup_message is given, provide this as the identifying message
         for Sloshy.
@@ -664,19 +669,62 @@ class SloshyLegacyConfig20211215(Sloshy):
 
 
 def main():
-    from sys import argv
-    logging.basicConfig(level=logging.INFO)
+    from argparse import ArgumentParser
 
-    if len(argv) > 1 and argv[1] == '--migrate':
-        SloshyLegacyConfig20211215(
-            argv[2] if len(argv) > 2 else "sloshy.yaml").migrate()
+    parser = ArgumentParser()
+    parser.add_argument(
+        '--migrate', action='store_true',
+        help='Migrate config from old schema to the current one, then exit.')
+    parser.add_argument(
+        '--announce',
+        help='Announce presence in any rooms where Sloshy has not appeared,'
+            ' then exit. Requires announcement string as argument.')
+    parser.add_argument(
+        '--test-rooms', action='store_true',
+        help='Test access to rooms without announcing presence, then exit.')
+    parser.add_argument(
+        '--local', action='store_true',
+        help='Run locally; do not emit chat messages.')
+    parser.add_argument(
+        '--verbose', action='store_true',
+        help='Emit room status messages on standard output.')
+    parser.add_argument(
+        '--loglevel', default='info',
+        help='Logging level: debug, info (default), warning, error')
+    parser.add_argument(
+        'conffile', nargs='?', default='',
+        help='Configuration file for Sloshy. Default is sloshy.yaml for'
+            ' regular run, test.yaml for --test-rooms')
+    parser.add_argument(
+        'startup_message', nargs='?', default=None,
+        help='Message to display in the home room when starting up'
+            ' (default: "manual run").')
+
+    args = parser.parse_args()
+
+    logging.basicConfig(level={
+        "debug": logging.DEBUG,
+        "info": logging.INFO,
+        "warn": logging.WARNING,
+        "error": logging.ERROR
+        }[args.loglevel])
+
+    if args.migrate:
+        SloshyLegacyConfig20211215(args.conffile or "sloshy.yaml").migrate()
         exit(0)
 
-    me = Sloshy(argv[1] if len(argv) > 1 else "test.yaml")
-    if len(argv) > 2 and argv[2] in ('--announce', '--test-rooms'):
-        me.test_rooms(argv[3] if len(argv) > 3 else None)
+    conffile = args.conffile or "test.yaml"
+    me = Sloshy(conffile, local=args.local, verbose=args.verbose)
+    if args.announce or args.test_rooms:
+        if args.local:
+            raise ValueError(
+                '--local is incompatible with --announce and --test-rooms')
+        if args.announce and args.test_rooms:
+            raise ValueError(
+                '--announce and --test-rooms are mutually exclusive')
+        me.test_rooms(args.announce)
     else:
-        me.perform_scan(argv[2] if len(argv) > 2 else None)
+        me.perform_scan(args.startup_message)
 
 
 if __name__ == '__main__':
