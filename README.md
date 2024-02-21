@@ -7,7 +7,7 @@
 
   [1]: https://github.com/tripleee/sloshy/actions/workflows/test-pushed.yml/badge.svg
   [4]: https://healthchecks.io/badge/1c6e4a7e-e3ba-4ea6-bd6a-4a7ba6/Dc19IJOD-2.svg
-  [5]: https://circleci.com/gh/tripleee/sloshy.svg?style=svg
+  [5]: https://circleci.com/gh/tripleee/sloshy.svg?style=shield
   [6]: https://app.circleci.com/pipelines/github/tripleee/sloshy
 
 This is a simple Stack Overflow / Stack Exchange chat bot
