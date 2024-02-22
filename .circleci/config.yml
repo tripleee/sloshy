@@ -15,13 +15,12 @@ orbs:
 # See: https://circleci.com/docs/workflows/ & https://circleci.com/docs/configuration-reference/#workflows
 workflows:
   nightly:
-    # Only build master branch
-    when:
-      and:
-        - equal: [ master, <<pipeline.git.branch >> ]
-    # Inside the workflow, you define the jobs you want to run.
     jobs:
       - nightly:
+          # Only build master branch
+          filters:
+            branches:
+              only: master
           context:
           - sloshy
 
