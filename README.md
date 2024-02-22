@@ -1,7 +1,7 @@
 # Sloshy the Thawman
 
 
-![Build status badge][1]
+[![Github Actions: Test pushed code][1]][7]
 [![CircleCI nightly][5]][6]
 ![Healthckecks.io status][4]
 
@@ -9,6 +9,7 @@
   [4]: https://healthchecks.io/badge/1c6e4a7e-e3ba-4ea6-bd6a-4a7ba6/Dc19IJOD-2.svg
   [5]: https://circleci.com/gh/tripleee/sloshy.svg?style=shield
   [6]: https://app.circleci.com/pipelines/github/tripleee/sloshy
+  |7]: https://github.com/tripleee/sloshy/issues/75
 
 This is a simple Stack Overflow / Stack Exchange chat bot
 which keeps an eye on a selected list of rooms,
