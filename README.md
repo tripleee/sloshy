@@ -3,13 +3,14 @@
 
 [![Github Actions: Test pushed code][1]][7]
 [![CircleCI nightly][5]][6]
-![Healthckecks.io status][4]
+[![Healthckecks.io status][4]][8]
 
   [1]: https://github.com/tripleee/sloshy/actions/workflows/test-pushed.yml/badge.svg
   [4]: https://healthchecks.io/badge/1c6e4a7e-e3ba-4ea6-bd6a-4a7ba6/Dc19IJOD-2.svg
   [5]: https://circleci.com/gh/tripleee/sloshy.svg?style=shield
   [6]: https://app.circleci.com/pipelines/github/tripleee/sloshy
-  |7]: https://github.com/tripleee/sloshy/issues/75
+  [7]: https://github.com/tripleee/sloshy/issues/75
+  [8]: https://ntfy.sh/sloshy-is-alive
 
 This is a simple Stack Overflow / Stack Exchange chat bot
 which keeps an eye on a selected list of rooms,
