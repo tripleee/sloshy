@@ -15,13 +15,12 @@ orbs:
 # See: https://circleci.com/docs/workflows/ & https://circleci.com/docs/configuration-reference/#workflows
 workflows:
   nightly:
-    # Only build master branch
-    when:
-      and:
-        - equal: [ master, <<pipeline.git.branch >> ]
-    # Inside the workflow, you define the jobs you want to run.
     jobs:
       - nightly:
+          # Only build master branch
+          filters:
+            branches:
+              only: master
           context:
           - sloshy
 
@@ -41,13 +40,13 @@ jobs:
     steps:
       # Checkout the code as the first step.
       - checkout
-      - python/install-packages:
-          pkg-manager: pip
-          # app-dir: ~/project/package-directory/  # If your requirements.txt isn't in the root directory.
-          # pip-dependency-file: test-requirements.txt  # if you have a different name for your requirements file, maybe one that combines your runtime and test requirements.
       - run:
-          name: Run tests
+          name: Scan all rooms, emit thawing notices where warranted
           no_output_timeout: 30m
           command: |
+            commit_timestamp=$(git log --no-walk --format=%at HEAD)
+            ((commit_timestamp - $(date -u +%s) < 3600)) && exit 0
+            # If we are still here, the latest commit was more than an hour ago
+            pip3 install -r requirements.txt
             python3 ./run.py --circle-ci
             curl -s https://hc-ping.com/${SLOSHY_HEALTHCHECK_UUID}
