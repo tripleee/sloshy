@@ -45,7 +45,11 @@ jobs:
           no_output_timeout: 30m
           command: |
             commit_timestamp=$(git log --no-walk --format=%at HEAD)
-            ((commit_timestamp - $(date -u +%s) < 3600)) && exit 0
+            commit_age=$(($(date -u +%s) - commit_timestamp))
+            if ((commit_age < 3600)); then
+                echo $commit_age '<' 3600 -- aborting
+                exit 0
+            fi
             # If we are still here, the latest commit was more than an hour ago
             pip3 install -r requirements.txt
             python3 ./run.py --circle-ci
