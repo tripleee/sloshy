@@ -30,6 +30,8 @@ There is no interactive interface to the bot;
 create a pull request
 if you would like to add a room to Sloshy's watch list.
 
+(If this feels too challenging, create an issue to request your room to be added. We'll still need the details which are specified below.)
+
 
 ### Configuration File Format
 
