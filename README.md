@@ -16,7 +16,9 @@ This is a simple Stack Overflow / Stack Exchange chat bot
 which keeps an eye on a selected list of rooms,
 and makes sure they are not frozen.
 
-To prevent a room from freezing, Sloshy enters the room and writes a message, which marks the room as active again.
+To prevent a room from freezing,
+Sloshy enters the room and writes a message,
+which marks the room as active again.
 
 The threshold is currently set to 12 days since the previous message,
 to leave some leeway for possible accidents
@@ -30,7 +32,9 @@ There is no interactive interface to the bot;
 create a pull request
 if you would like to add a room to Sloshy's watch list.
 
-(If this feels too challenging, create an issue to request your room to be added. We'll still need the details which are specified below.)
+(If this feels too challenging,
+create an issue to request your room to be added.
+We'll still need the details which are specified below.)
 
 
 ### Configuration File Format
@@ -48,7 +52,7 @@ but you really don't need to be very familiar with the format
 to make simple changes.
 
 | :warning:      | Configuration file format changed in PR #23 (August 2023) |
-|----------------|:--------------------------------------------|
+|----------------|:----------------------------------------------------------|
 
 In the YAML configuration file, add the server's name
 to the `servers` key if it is missing (though that's unlikely)
