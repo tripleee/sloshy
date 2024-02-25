@@ -41,16 +41,15 @@ jobs:
       # Checkout the code as the first step.
       - checkout
       - run:
-          name: Scan all rooms, emit thawing notices where warranted
+          name: "Run nightly scan if this wasn't triggered by a recent commit"
           no_output_timeout: 30m
           command: |
             commit_timestamp=$(git log --no-walk --format=%at HEAD)
             commit_age=$(($(date -u +%s) - commit_timestamp))
             if ((commit_age < 3600)); then
-                echo $commit_age '<' 3600 -- aborting
+                echo "Commit age $commit_age < 3600 -- aborting"
                 exit 0
             fi
-            # If we are still here, the latest commit was more than an hour ago
             pip3 install -r requirements.txt
             python3 ./run.py --circle-ci
             curl -s https://hc-ping.com/${SLOSHY_HEALTHCHECK_UUID}
