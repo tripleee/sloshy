@@ -111,6 +111,9 @@ servers:
     - contact: gparyani (78973)
       id: 591
       name: 'You Are Here'
+    - contact: DLosc (94057)
+      id: 110136
+      name: 'The Tarpit'
     sloshy_id: 514718
   chat.stackoverflow.com:
     rooms:
