@@ -62,7 +62,8 @@ jobs:
       - run:
           name: "Simple posting test"
           command: |
-            python sloshy.py test-pushed.yaml "Github Actions Push test"
+            python sloshy.py --location_extra="CircleCI" \
+                test-pushed.yaml "Github Actions Push test"
       - run:
           name: "Generate config for posting test"
           command: |
@@ -70,12 +71,14 @@ jobs:
       - run:
           name: "Test room availability"
           command: |
-            python sloshy.py room-test.yaml --test-rooms
+            python sloshy.py room-test.yaml \
+                --test-rooms --location_extra="CircleCI"
       - run:
           name: "Announce presence in any new room"
           command: |
             python sloshy.py room-test.yaml \
-               --announce "Sloshy is here! (See profile for details)"
+               --announce "Sloshy is here! (See profile for details)" \
+               --location_extra="CircleCI"
       - run:
           name: "Clean up config file after tests"
           command: |
