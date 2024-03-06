@@ -1,7 +1,7 @@
 """
 Main function for Sloshy the Thawman
 
-Runs periodically from a lambda in AWS
+Nightly job run from GithubActions or CircleCI
 
 Wake up, check if there are any rooms have no recent activity,
 post a brief message in those to keep them from freezing
@@ -18,14 +18,12 @@ if __name__ == '__main__':
     assert 'SLOSHY_EMAIL' in os.environ
     assert 'SLOSHY_PASSWORD' in os.environ
     if len(sys.argv) == 1:
-        greeting = "nightly run"
-        location = "Github Actions"
+        location_extra = "Github Actions"
         verbose = False
     elif sys.argv[1] == "--circle-ci":
-        greeting = "circleci run"
-        location = "CircleCI"
+        location_extra = "CircleCI"
         verbose = True
-    sloshy = Sloshy("sloshy.yaml", verbose=verbose)
-    sloshy.config['nodename'] = f"{sloshy.nodename()} ({location})"
+    sloshy = Sloshy(
+        "sloshy.yaml", verbose=verbose, location_extra=location_extra)
     sloshy.test_rooms()
-    sloshy.perform_scan(greeting)
+    sloshy.perform_scan("nightly run")
