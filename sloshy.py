@@ -191,13 +191,29 @@ class Room:
 
 
 class Sloshy:
-    def __init__(self, conffile=None, local=False, verbose=False):
+    def __init__(
+            self,
+            conffile=None,
+            local=False,
+            verbose=False,
+            nodename=None,
+            location_extra=None
+    ):
         """
         Create a Sloshy instance by parsing the supplied YAML file.
 
         With local=True, don't connect to chat rooms.
 
         With verbose=True, emit room status messages on standard output.
+
+        With nodename, specify a node name to display in the greeting,
+        overriding whatever the configuration file says. (The default is
+        the output from nodename().)
+
+        With location_extra, specify additional location information in
+        the greeting. This is intended to allow you to indicate a platform,
+        like for example Github Actions or CircleCI, where the nodename
+        alone is rather uninformative. (The default is None.)
         """
         self.conffile = conffile
         self.local = local
@@ -219,6 +235,12 @@ class Sloshy:
             self.password = environ.get('SLOSHY_PASSWORD')
         self.chatclients.authnz(self.email, self.password)
 
+        if nodename is not None:
+            self.config['nodename'] = nodename
+
+        if location_extra is not None:
+            self.config['location_extra'] = location_extra
+            
     def load_conf(self, conffile=None):
         """
         Load YAML config from self.conffile, or the given file if specified
@@ -337,7 +359,10 @@ class Sloshy:
         """
         if 'nodename' not in self.config:
             self.config['nodename'] = platform.node()
-        return self.config['nodename']
+        base_nodename = self.config['nodename']
+        if 'location_extra' in self.config:
+            return '%s (%s)' % (base_nodename, self.config['location_extra'])
+        return base_nodename
 
     def generate_chat_message(self):
         """
@@ -692,6 +717,12 @@ def main():
         '--loglevel', default='info',
         help='Logging level: debug, info (default), warning, error')
     parser.add_argument(
+        '--nodename',
+        help='Specify nodename for Sloshy (overrides config file)')
+    parser.add_argument(
+        '--location_extra',
+        help='Provide additional context for location (like Github/CircleCI)')
+    parser.add_argument(
         'conffile', nargs='?', default='',
         help='Configuration file for Sloshy. Default is sloshy.yaml for'
             ' regular run, test.yaml for --test-rooms')
@@ -714,7 +745,9 @@ def main():
         exit(0)
 
     conffile = args.conffile or "test.yaml"
-    me = Sloshy(conffile, local=args.local, verbose=args.verbose)
+    me = Sloshy(
+        conffile, local=args.local, verbose=args.verbose,
+        nodename=args.nodename, location_extra=args.location_extra)
     if args.announce or args.test_rooms:
         if args.local:
             raise ValueError(
