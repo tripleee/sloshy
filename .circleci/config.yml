@@ -5,11 +5,15 @@ orbs:
 
 workflows:
   nightly:
-    jobs:
-      - nightly:
+    triggers:
+      - schedule:
+          cron: "17 3 * * *"
           filters:
             branches:
-              only: master
+              only:
+                - master
+    jobs:
+      - nightly:
           context:
           - sloshy
   test-pushed:
@@ -28,17 +32,12 @@ jobs:
 
     steps:
       - checkout
+      - python/install-packages:
+          pkg-manager: pip
       - run:
-          name: "Run nightly scan if this wasn't triggered by a recent commit"
+          name: "Run nightly scan"
           no_output_timeout: 30m
           command: |
-            commit_timestamp=$(git log --no-walk --format=%at HEAD)
-            commit_age=$(($(date -u +%s) - commit_timestamp))
-            if ((commit_age < 3600)); then
-                echo "Commit age $commit_age < 3600 -- aborting"
-                exit 0
-            fi
-            pip3 install -r requirements.txt
             python3 ./run.py --circle-ci
             curl -s https://hc-ping.com/${SLOSHY_HEALTHCHECK_UUID}
 
