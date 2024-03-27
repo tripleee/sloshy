@@ -114,6 +114,21 @@ servers:
     - contact: DLosc (94057)
       id: 110136
       name: 'The Tarpit'
+    - contact: tripleee (468289)
+      id: 39466
+      name 'MATL CHATL (standing in for Toasty)'
+    - contact: tripleee (468289)
+      id: 125050
+      name: 'The Edge of Propinquity (standing in for Toasty)'
+    - contact: tripleee (468289)
+      id: 123853
+      name: 'The Nineteenth Bakery (standing in for Toasty)'
+    - contact: tripleee (468289)
+      id: 137507
+      name: 'Run This Offline (standing in for Toasty)'
+    - contact: tripleee (468289)
+      id: 147285
+      name: 'PLDI Hot Network Questions (standing in for Toasty)'
     sloshy_id: 514718
   chat.stackoverflow.com:
     rooms:
