@@ -1,8 +1,8 @@
 # Sloshy the Thawman
 
 
-[![Github Actions: Test pushed code][1]][7]
-[![CircleCI nightly][5]][6]
+[![CircleCI: Test pushed code][1]][7]
+[![CircleCI status][5]][6]
 [![Healthckecks.io status][4]][8]
 
   [1]: https://github.com/tripleee/sloshy/actions/workflows/test-pushed.yml/badge.svg
