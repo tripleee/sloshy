@@ -129,6 +129,9 @@ servers:
     - contact: tripleee (468289)
       id: 147285
       name: 'PLDI Hot Network Questions (standing in for Toasty)'
+    - contact: tripleee (468289)
+      id: 147825
+      name: 'The Garbage Disposal (standing in for Toasty)'
     sloshy_id: 514718
   chat.stackoverflow.com:
     rooms:
