@@ -152,6 +152,7 @@ class Room:
         self.name = name
         self.log_id = 'https://%s/rooms/%i' % (server, id)
         self.escaped_name = name.replace('[', r'\[').replace(']', r'\]')
+        self.linked_name = '[%s](%s)' % (self.escaped_name, self.log_id)
         self.sloshy_id = sloshy_id
         self.clients = clients
 
@@ -440,7 +441,7 @@ class Sloshy:
         for room in self.rooms:
             sloshy_id = room.get_sloshy_id()
             if announce is None:
-                logging.info('Joining %s', room.log_id)
+                logging.info('Joining %s', room.linked_name)
                 try:
                     room.send_message("")  # just join, don't send anything
                 except KeyError as exception:
@@ -456,7 +457,7 @@ class Sloshy:
                     #   eventtime = response.json()['time']
                     # KeyError: 'time'
                     self.log_error(
-                        '** Error: could not join %s' % room.log_id)
+                        '** Error: could not join %s' % room.linked_name)
                     self.log_error(repr(exception))
                     counter['fail'].add(room.log_id)
                 counter['server'].add(room.server)
@@ -473,7 +474,7 @@ class Sloshy:
                 except RequestException as exception:
                     self.log_error(
                         '** Error: could not fetch transcript for %s'
-                        % room.log_id)
+                        % room.linked_name)
                     self.log_error(repr(exception))
                     counter['fail'].add(room.log_id)
                     break
@@ -493,12 +494,12 @@ class Sloshy:
                 except KeyError as exception:
                     self.log_error(
                         '** Error: could not announce presence in %s'
-                        % room.log_id)
+                        % room.linked_name)
                     self.log_error(repr(exception))
                     counter['fail'].add(room.log_id)
                     continue
                 self.log_notice(
-                    'announced presence in %s' % room.log_id, cc=True)
+                    'announced presence in %s' % room.linked_name, cc=True)
         if announce is None:
             self.log_notice(
                 'scanned %i rooms on %i servers' % (
@@ -548,7 +549,7 @@ class Sloshy:
                     ) as exception:
                 self.log_error(
                     '** Error: could not fetch transcript for %s'
-                    % room.log_id)
+                    % room.linked_name)
                 self.log_error(repr(exception))
                 failures.add(room.log_id)
                 continue
@@ -575,12 +576,12 @@ class Sloshy:
                     self.notice(room)
                     self.log_notice(
                         '%s: Age threshold exceeded; sending a%s thawing notice'
-                        % (room.log_id,
+                        % (room.linked_name,
                            '' if age>maxage else 'n expedited'), cc=True)
                 except ChatActionError as err:
                     self.log_error(
                         '%s: Age threshold exceeded, but failed to thaw: %s'
-                        % (room.log_id, err))
+                        % (room.linked_name, err))
                     failures.add(room.id)
 
         if failures:
