@@ -101,21 +101,21 @@ class Chatclients:
             if self.local:
                 client = LocalClient(site)
             else:
-                self.rep_check = self.perform_rep_check()
+                self.perform_rep_check()
                 client = ChExClient(site)
             client.login(self.email, self.password)
             self.servers[server] = client
         return self.servers[server]
 
-    def perform_rep_check(self) -> None:
+    def perform_rep_check(self) -> RepScrape:
         """
         Fetch Sloshy's network profile page's accounts tab
         and check that relevant accounts have enough reputation
         points to participate in chat (requires 30 rep).
         """
-        if self.rep_check is not None:
-            return None
-        self.rep_check = RepScrape(21818820)
+        if self.rep_check is None:
+            self.rep_check = RepScrape(21818820)
+        return self.rep_check
 
     def logout(self):
         """
