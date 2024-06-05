@@ -33,9 +33,12 @@ class LocalClientRequestQueue:
         return True
 
 
-def td_no_ms(then: datetime) -> timedelta:
-    "Return a timedelta between then and now without microseconds"
-    td = datetime.now() - then
+def td_no_ms(then: datetime, when: datetime|None = None) -> timedelta:
+    """Return a timedelta between then and now (or when, if specified)
+    without microseconds"""
+    if when is None:
+        when = datetime.now()
+    td = when - then
     return td - timedelta(microseconds=td.microseconds)
 
 
@@ -582,9 +585,7 @@ class Sloshy:
                 continue
             if room_latest:
                 when = room_latest['when']
-                age = start_time - when
-                # Trim microseconds
-                age = age - timedelta(microseconds=age.microseconds)
+                age = td_no_ms(when, start_time)
                 msg = '[%s](%s): latest activity %s (%s hours ago)' % (
                     room.escaped_name, room_latest['url'], when, age)
             else:
