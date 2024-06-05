@@ -171,8 +171,8 @@ class Room:
         self._scan_end = None
 
     def scan_duration(self, no_ms: bool = False) -> timedelta:
-        "Return scan duration as a timedelta. If no_ms is True,
-        return without ms."
+        """Return scan duration as a timedelta. If no_ms is True,
+        return without ms."""
         if self._scan_start is None or self._scan_end is None:
             return timedelta(0)
         diff = self._scan_end - self._scan_start
