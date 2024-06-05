@@ -33,7 +33,7 @@ class LocalClientRequestQueue:
         return True
 
 
-def td_no_ms(then: datetime, when: datetime|None = None) -> timedelta:
+def td_no_us(then: datetime, when: datetime|None = None) -> timedelta:
     """Return a timedelta between then and now (or when, if specified)
     without microseconds"""
     if when is None:
@@ -527,7 +527,7 @@ class Sloshy:
             self.log_notice(
                 'Permissions check done in %s; '
                 'scanned %i rooms on %i servers' % (
-                    td_no_ms(start_time),
+                    td_no_us(start_time),
                     len(counter['id']), len(counter['server'])))
         if len(counter['fail']) > 0:
             raise ValueError('failed to process rooms %s' % counter['fail'])
@@ -585,7 +585,7 @@ class Sloshy:
                 continue
             if room_latest:
                 when = room_latest['when']
-                age = td_no_ms(when, start_time)
+                age = td_no_us(when, start_time)
                 msg = '[%s](%s): latest activity %s (%s hours ago)' % (
                     room.escaped_name, room_latest['url'], when, age)
             else:
@@ -619,7 +619,7 @@ class Sloshy:
 
         self.log_notice(
             'Room scan done in %s; scanned %i rooms on %i servers' % (
-                td_no_ms(start_time), len(self.rooms), len(servers)))
+                td_no_us(start_time), len(self.rooms), len(servers)))
 
         if slow_summary:
             slowest = {room: room.scan_duration() for room in self.rooms}
