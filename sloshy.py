@@ -161,6 +161,14 @@ class Room:
 
         self._chatroom = None
 
+        self._scan_start = None
+        self._scan_end = None
+
+    def scan_duration(self) -> timedelta:
+        if self._scan_start is None or self._scan_end is None:
+            return timedelta(0)
+        return self._scan_end - self._scan_start
+
     def set_as_home_room(self):
         self.homeroom = True
 
@@ -502,7 +510,7 @@ class Sloshy:
                     'announced presence in %s' % room.linked_name, cc=True)
         if announce is None:
             self.log_notice(
-                'scanned %i rooms on %i servers' % (
+                'Permissions check done; scanned %i rooms on %i servers' % (
                     len(counter['id']), len(counter['server'])))
         if len(counter['fail']) > 0:
             raise ValueError('failed to process rooms %s' % counter['fail'])
@@ -539,11 +547,14 @@ class Sloshy:
 
         fetcher = Transcript()
         homeroom = self.homeroom
+        servers = set()
         self.startup_notice(homeroom, startup_message)
         for room in self.rooms:
             if room.is_home_room() and 'scan_homeroom' not in self.config:
                 continue
+            servers.add(room.server)
             try:
+                room._scan_start = datetime.now()
                 room_latest = fetcher.latest(room.id, room.server)
             except (TranscriptFrozenDeletedException, RequestException
                     ) as exception:
@@ -583,10 +594,23 @@ class Sloshy:
                         '%s: Age threshold exceeded, but failed to thaw: %s'
                         % (room.linked_name, err))
                     failures.add(room.id)
+            room._scan_end = datetime.now()
 
         if failures:
             raise ValueError('Failed to process %i rooms: %s' % (
                 len(failures), failures))
+
+        self.log_notice(
+            'Room scan done in %s; scanned %i rooms on %i servers' % (
+                (datetime.now() - now), len(self.rooms), len(servers)))
+
+        slowest = {room: room.scan_duration() for room in self.rooms}
+        for room in sorted(slowest, key=slowest.get, reverse=True)[0:5]:
+            if slowest[room] == timedelta(seconds=0):
+                break
+            self.log_notice(
+                'Relatively slow room: %s (%s)' % (
+                    room.linked_name, room.scan_duration()))
 
     def perform_scan(self, startup_message=None):
         """
