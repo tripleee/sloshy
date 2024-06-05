@@ -558,8 +558,8 @@ class Sloshy:
             if room.is_home_room() and 'scan_homeroom' not in self.config:
                 continue
             servers.add(room.server)
+            room._scan_start = datetime.now()
             try:
-                room._scan_start = datetime.now()
                 room_latest = fetcher.latest(room.id, room.server)
             except (TranscriptFrozenDeletedException, RequestException
                     ) as exception:

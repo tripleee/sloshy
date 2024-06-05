@@ -99,6 +99,11 @@ class Transcript(SloshyClient):
             date = datetime.strptime(datestr, '%Y-%m-%d')
 
             monologue = soup.body.find_all("div", {"class": "monologue"})
+            if not monologue:
+                logging.warning("No monologue found in %s", url)
+                logging.debug(soup.body)
+                continue
+
             for message in reversed(monologue):
                 when = message.find("div", {"class": "timestamp"})
                 if when:
@@ -123,6 +128,7 @@ class Transcript(SloshyClient):
                         except ValueError:
                             userid = 0
 
+                logging.debug("yielding message %r", {"server": server, "room": room, "url": url, "when": datetime.combine(date, time), "user": {"name": username, "id": userid}, "msg": message.find("div", {"class": "content"}).text.strip(), "link": url})
                 yield {
                     'server': server,
                     'room': room,
@@ -188,13 +194,16 @@ class Transcript(SloshyClient):
                 continue
             messages.append(message)
             if userid not in users:
-                logging.debug("found user %i", userid)
+                logging.debug("room %i: found user %i", room, userid)
                 users.add(userid)
             if len(users) >= userlimit and len(messages) >= messagelimit:
                 logging.info(
                     "went back to %s, got %i messages, %i users",
                     message["url"], len(messages), len(users))
                 return messages
+            logging.debug(
+                "room %i: users %s, %i/%i messages", room, users,
+                len(messages), messagelimit)
         logging.warning(
             "went back to %s, only found %i messages, %i users",
             message["url"], len(messages), len(users))
