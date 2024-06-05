@@ -34,9 +34,9 @@ class LocalClientRequestQueue:
 
 
 def td_no_ms(then: datetime) -> timedelta:
-    "Return a timedelta between then and now without milliseconds"
+    "Return a timedelta between then and now without microseconds"
     td = datetime.now() - then
-    return td - timedelta(milliseconds=td.milliseconds)
+    return td - timedelta(microseconds=td.microseconds)
 
 
 class LocalClient:
@@ -177,7 +177,7 @@ class Room:
             return timedelta(0)
         diff = self._scan_end - self._scan_start
         if no_ms:
-            diff = diff - timedelta(milliseconds=diff.milliseconds)
+            diff = diff - timedelta(microseconds=diff.milliseconds)
         return diff
 
     def set_as_home_room(self):
