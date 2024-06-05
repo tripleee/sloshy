@@ -33,6 +33,12 @@ class LocalClientRequestQueue:
         return True
 
 
+def td_no_ms(then: datetime) -> timedelta:
+    "Return a timedelta between then and now without milliseconds"
+    td = datetime.now() - then
+    return td - timedelta(milliseconds=td.milliseconds)
+
+
 class LocalClient:
     """
     Simple mock ChatExchange.client with no actual networking functionality
@@ -164,10 +170,15 @@ class Room:
         self._scan_start = None
         self._scan_end = None
 
-    def scan_duration(self) -> timedelta:
+    def scan_duration(self, no_ms: bool = False) -> timedelta:
+        "Return scan duration as a timedelta. If no_ms is True,
+        return without ms."
         if self._scan_start is None or self._scan_end is None:
             return timedelta(0)
-        return self._scan_end - self._scan_start
+        diff = self._scan_end - self._scan_start
+        if no_ms:
+            diff = diff - timedelta(milliseconds=diff.milliseconds)
+        return diff
 
     def set_as_home_room(self):
         self.homeroom = True
@@ -422,7 +433,7 @@ class Sloshy:
         log_emit(message)
         self.send_chat_message(self.homeroom, message)
         if self.verbose:
-            print(str(datetime.utcnow()), message)
+            print(str(datetime.now()), message)
         if cc:
             for ccroom in self.ccrooms:
                 self.send_chat_message(ccroom, message)
@@ -511,9 +522,9 @@ class Sloshy:
                     'announced presence in %s' % room.linked_name, cc=True)
         if announce is None:
             self.log_notice(
-                'Permissions check done in %s;'
+                'Permissions check done in %s; '
                 'scanned %i rooms on %i servers' % (
-                    datetime.now() - start_time,
+                    td_no_ms(start_time),
                     len(counter['id']), len(counter['server'])))
         if len(counter['fail']) > 0:
             raise ValueError('failed to process rooms %s' % counter['fail'])
@@ -607,7 +618,7 @@ class Sloshy:
 
         self.log_notice(
             'Room scan done in %s; scanned %i rooms on %i servers' % (
-                (datetime.now() - start_time), len(self.rooms), len(servers)))
+                td_no_ms(start_time), len(self.rooms), len(servers)))
 
         if slow_summary:
             slowest = {room: room.scan_duration() for room in self.rooms}
@@ -616,7 +627,7 @@ class Sloshy:
                     break
                 self.log_notice(
                     'Relatively slow room: %s (%s)' % (
-                        room.linked_name, room.scan_duration()))
+                        room.linked_name, room.scan_duration(no_ms=True)))
 
     def perform_scan(self, startup_message=None, slow_summary=True):
         """
