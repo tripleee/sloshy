@@ -144,7 +144,9 @@ and reach a reasonable consensus among them,
 that would probably be fine, too).
 
 If you think this is too old-school, perhaps check out
-[the competition.](https://toasty.ginger.rto.community/)
+[the competition.][9]
+
+ [9]: https://stackapps.com/questions/10422/toasty-a-better-chat-antifreeze-bot
 
 
 ### Migrating Old Configurations
