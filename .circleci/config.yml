@@ -61,7 +61,7 @@ jobs:
       - run:
           name: "Simple posting test"
           command: |
-            python sloshy.py --location_extra="CircleCI" \
+            python sloshy.py --location_extra="CircleCI" --no-slow-summary \
                 test-pushed.yaml "Github Actions Push test"
       - run:
           name: "Generate config for posting test"
