@@ -2,6 +2,7 @@
 Simple client for fetching latest activity in a chat room
 """
 
+from __future__ import annotations
 from datetime import datetime
 from time import sleep
 import platform
@@ -50,10 +51,10 @@ class Transcript(SloshyClient):
     def fetch(
             self, server: str, room: int,
             fallback_sleep: int = 1
-    ) -> tuple:  # TODO: better typing?
+    ) -> tuple[BeautifulSoup, str]:
         """
         Generator to retrieve increasingly old room transcripts from server
-        and extract the .text component as a BeautifulSoup object, and the
+        and yield a tuple with the contents as a BeautifulSoup object, and the
         URL it was fetched from.
 
         Optionally sleep before fetching an older page; the fallback_sleep
@@ -128,20 +129,21 @@ class Transcript(SloshyClient):
                         except ValueError:
                             userid = 0
 
-                logging.debug("yielding message %r", {"server": server, "room": room, "url": url, "when": datetime.combine(date, time), "user": {"name": username, "id": userid}, "msg": message.find("div", {"class": "content"}).text.strip(), "link": url})
-                yield {
-                    'server': server,
-                    'room': room,
-                    'url': url,
-                    'when': datetime.combine(date, time),
-                    'user': {
-                        'name': username,
-                        'id': userid
-                        },
-                    'msg': message.find(
+                result = {
+                    "server": server,
+                    "room": room,
+                    "url": url,
+                    "when": datetime.combine(date, time),
+                    "user": {
+                        "name": username,
+                        "id": userid
+                    },
+                    "msg": message.find(
                         "div", {"class": "content"}).text.strip(),
-                    'link': url
+                    "link": url
                 }
+                logging.debug("yielding message %r", result)
+                yield result
 
     def check_frozen_or_deleted(self, server: str, room: int) -> bool:
         """
