@@ -533,7 +533,7 @@ class Sloshy:
         if not startup_message:
             startup_message = "manual run"
 
-        now = datetime.now()
+        start_time = datetime.now()
         failures = set()
 
         # Default freeze schedule is 14 days; thaw a little before that,
@@ -571,7 +571,7 @@ class Sloshy:
                 continue
             if room_latest:
                 when = room_latest['when']
-                age = now-when
+                age = start_time - when
                 # Trim microseconds
                 age = age - timedelta(microseconds=age.microseconds)
                 msg = '[%s](%s): latest activity %s (%s hours ago)' % (
@@ -607,7 +607,7 @@ class Sloshy:
 
         self.log_notice(
             'Room scan done in %s; scanned %i rooms on %i servers' % (
-                (datetime.now() - now), len(self.rooms), len(servers)))
+                (datetime.now() - start_time), len(self.rooms), len(servers)))
 
         if slow_summary:
             slowest = {room: room.scan_duration() for room in self.rooms}
