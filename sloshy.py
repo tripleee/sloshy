@@ -443,6 +443,7 @@ class Sloshy:
         each room in turn; if we have, regard it as tested. If not,
         attempt to write the announcement message to the room in question.
         """
+        start_time = datetime.now()
         fetcher = Transcript()
         counter = {'server': set(), 'id': set(), 'fail': set()}
         self.startup_notice(self.homeroom, announce or "room test")
@@ -510,12 +511,14 @@ class Sloshy:
                     'announced presence in %s' % room.linked_name, cc=True)
         if announce is None:
             self.log_notice(
-                'Permissions check done; scanned %i rooms on %i servers' % (
+                'Permissions check done in %s;'
+                'scanned %i rooms on %i servers' % (
+                    datetime.now() - start_time,
                     len(counter['id']), len(counter['server'])))
         if len(counter['fail']) > 0:
             raise ValueError('failed to process rooms %s' % counter['fail'])
 
-    def scan_rooms(self, startup_message=None):
+    def scan_rooms(self, startup_message=None, slow_summary=True):
         """
         Main entry point for scanning: Visit room transcripts,
         check if they are in danger of being frozen; if so, join
@@ -524,11 +527,13 @@ class Sloshy:
         The startup_message is included in the notification in the
         monitoring room when Sloshy starts up.
         If it is empty, missing, or None, it defaults to "manual run".
+
+        If slow_summary is not true, skip summarizing the slowest rooms.
         """
         if not startup_message:
             startup_message = "manual run"
 
-        now = datetime.now()
+        start_time = datetime.now()
         failures = set()
 
         # Default freeze schedule is 14 days; thaw a little before that,
@@ -553,8 +558,8 @@ class Sloshy:
             if room.is_home_room() and 'scan_homeroom' not in self.config:
                 continue
             servers.add(room.server)
+            room._scan_start = datetime.now()
             try:
-                room._scan_start = datetime.now()
                 room_latest = fetcher.latest(room.id, room.server)
             except (TranscriptFrozenDeletedException, RequestException
                     ) as exception:
@@ -566,7 +571,7 @@ class Sloshy:
                 continue
             if room_latest:
                 when = room_latest['when']
-                age = now-when
+                age = start_time - when
                 # Trim microseconds
                 age = age - timedelta(microseconds=age.microseconds)
                 msg = '[%s](%s): latest activity %s (%s hours ago)' % (
@@ -602,25 +607,25 @@ class Sloshy:
 
         self.log_notice(
             'Room scan done in %s; scanned %i rooms on %i servers' % (
-                (datetime.now() - now), len(self.rooms), len(servers)))
+                (datetime.now() - start_time), len(self.rooms), len(servers)))
 
-        slowest = {room: room.scan_duration() for room in self.rooms}
-        for room in sorted(slowest, key=slowest.get, reverse=True)[0:5]:
-            if slowest[room] == timedelta(seconds=0):
-                break
-            self.log_notice(
-                'Relatively slow room: %s (%s)' % (
-                    room.linked_name, room.scan_duration()))
+        if slow_summary:
+            slowest = {room: room.scan_duration() for room in self.rooms}
+            for room in sorted(slowest, key=slowest.get, reverse=True)[0:5]:
+                if slowest[room] == timedelta(seconds=0):
+                    break
+                self.log_notice(
+                    'Relatively slow room: %s (%s)' % (
+                        room.linked_name, room.scan_duration()))
 
-    def perform_scan(self, startup_message=None):
+    def perform_scan(self, startup_message=None, slow_summary=True):
         """
         Entry point for a full scan: Perform room scan, then logout().
 
-        If startup_message is given, provide this as the identifying message
-        for Sloshy.
+        startup_message and slow_summary are passed to scan_rooms().
         """
         try:
-            self.scan_rooms(startup_message)
+            self.scan_rooms(startup_message, slow_summary)
         except Exception as exception:
             raise
         finally:
@@ -748,6 +753,9 @@ def main():
         '--location_extra',
         help='Provide additional context for location (like Github/CircleCI)')
     parser.add_argument(
+        '--no-slow-summary', action='store_true',
+        help='Do not display a summary of slow rooms at the end')
+    parser.add_argument(
         'conffile', nargs='?', default='',
         help='Configuration file for Sloshy. Default is sloshy.yaml for'
             ' regular run, test.yaml for --test-rooms')
@@ -780,9 +788,13 @@ def main():
         if args.announce and args.test_rooms:
             raise ValueError(
                 '--announce and --test-rooms are mutually exclusive')
+        if args.no_slow_summary:
+            raise ValueError(
+                '--no-slow-summary is incompatible with --announce '
+                'and --test-rooms')
         me.test_rooms(args.announce)
     else:
-        me.perform_scan(args.startup_message)
+        me.perform_scan(args.startup_message, not args.no_slow_summary)
 
 
 if __name__ == '__main__':
