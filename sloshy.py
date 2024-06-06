@@ -153,7 +153,7 @@ class Room:
             server: str,
             id: int,
             name: str,
-            sloshy_id: int,
+            sloshy_id: int | None,
             clients: Chatclients
     ):
         self.server = server
@@ -162,6 +162,7 @@ class Room:
         self.log_id = 'https://%s/rooms/%i' % (server, id)
         self.escaped_name = name.replace('[', r'\[').replace(']', r'\]')
         self.linked_name = '[%s](%s)' % (self.escaped_name, self.log_id)
+        # sloshy_id can be None when migrating an old schema
         self.sloshy_id = sloshy_id
         self.clients = clients
 
@@ -693,7 +694,8 @@ class SloshyLegacyConfig20211215(Sloshy):
                             server, room['id'], room['name'], conffile)
                         continue
                     seen.add(room['id'])
-                    roomobj = Room(server, room['id'], room['name'], clients)
+                    roomobj = Room(
+                        server, room['id'], room['name'], None, clients)
                     self.rooms.append(roomobj)
                     if 'role' in room and room['role'] == 'home':
                         assert self.homeroom is None
