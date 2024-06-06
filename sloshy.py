@@ -33,9 +33,12 @@ class LocalClientRequestQueue:
         return True
 
 
-def td_no_ms(then: datetime) -> timedelta:
-    "Return a timedelta between then and now without microseconds"
-    td = datetime.now() - then
+def td_no_us(then: datetime, when: datetime|None = None) -> timedelta:
+    """Return a timedelta between then and now (or when, if specified)
+    without microseconds"""
+    if when is None:
+        when = datetime.now()
+    td = when - then
     return td - timedelta(microseconds=td.microseconds)
 
 
@@ -150,7 +153,7 @@ class Room:
             server: str,
             id: int,
             name: str,
-            sloshy_id: int,
+            sloshy_id: int | None,
             clients: Chatclients
     ):
         self.server = server
@@ -159,6 +162,7 @@ class Room:
         self.log_id = 'https://%s/rooms/%i' % (server, id)
         self.escaped_name = name.replace('[', r'\[').replace(']', r'\]')
         self.linked_name = '[%s](%s)' % (self.escaped_name, self.log_id)
+        # sloshy_id can be None when migrating an old schema
         self.sloshy_id = sloshy_id
         self.clients = clients
 
@@ -175,9 +179,10 @@ class Room:
         return without ms."""
         if self._scan_start is None or self._scan_end is None:
             return timedelta(0)
-        diff = self._scan_end - self._scan_start
         if no_ms:
-            diff = diff - timedelta(microseconds=diff.milliseconds)
+            diff = td_no_us(self._scan_start, self._scan_end)
+        else:
+            diff = self._scan_end - self._scan_start
         return diff
 
     def set_as_home_room(self):
@@ -524,7 +529,7 @@ class Sloshy:
             self.log_notice(
                 'Permissions check done in %s; '
                 'scanned %i rooms on %i servers' % (
-                    td_no_ms(start_time),
+                    td_no_us(start_time),
                     len(counter['id']), len(counter['server'])))
         if len(counter['fail']) > 0:
             raise ValueError('failed to process rooms %s' % counter['fail'])
@@ -582,9 +587,7 @@ class Sloshy:
                 continue
             if room_latest:
                 when = room_latest['when']
-                age = start_time - when
-                # Trim microseconds
-                age = age - timedelta(microseconds=age.microseconds)
+                age = td_no_us(when, start_time)
                 msg = '[%s](%s): latest activity %s (%s hours ago)' % (
                     room.escaped_name, room_latest['url'], when, age)
             else:
@@ -594,9 +597,13 @@ class Sloshy:
             self.log_notice(msg)
             quiet = False
             if age <= maxage and age > max_aggressive_age:
+                if room.sloshy_id is None:
+                    logging.warning(
+                        "Room %s (%i) has no Sloshy ID", room.name, room.id)
                 activity = fetcher.usercount(
                     room.id, room.server, userlimit=2,
-                    messagelimit=AGGRESSIVE_MAX_MSG_THRESHOLD)
+                    messagelimit=AGGRESSIVE_MAX_MSG_THRESHOLD,
+                    sloshy_id=room.sloshy_id)
                 quiet = not activity
             if age > maxage or (quiet and age > max_aggressive_age):
                 try:
@@ -618,12 +625,12 @@ class Sloshy:
 
         self.log_notice(
             'Room scan done in %s; scanned %i rooms on %i servers' % (
-                td_no_ms(start_time), len(self.rooms), len(servers)))
+                td_no_us(start_time), len(self.rooms), len(servers)))
 
         if slow_summary:
             slowest = {room: room.scan_duration() for room in self.rooms}
             for room in sorted(slowest, key=slowest.get, reverse=True)[0:5]:
-                if slowest[room] == timedelta(seconds=0):
+                if slowest[room] <= timedelta(seconds=60):
                     break
                 self.log_notice(
                     'Relatively slow room: %s (%s)' % (
@@ -691,7 +698,8 @@ class SloshyLegacyConfig20211215(Sloshy):
                             server, room['id'], room['name'], conffile)
                         continue
                     seen.add(room['id'])
-                    roomobj = Room(server, room['id'], room['name'], clients)
+                    roomobj = Room(
+                        server, room['id'], room['name'], None, clients)
                     self.rooms.append(roomobj)
                     if 'role' in room and room['role'] == 'home':
                         assert self.homeroom is None

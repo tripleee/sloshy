@@ -2,7 +2,8 @@
 Simple client for fetching latest activity in a chat room
 """
 
-from datetime import datetime
+from __future__ import annotations
+from datetime import datetime, timedelta
 from time import sleep
 import platform
 import logging
@@ -50,10 +51,10 @@ class Transcript(SloshyClient):
     def fetch(
             self, server: str, room: int,
             fallback_sleep: int = 1
-    ) -> tuple:  # TODO: better typing?
+    ) -> tuple[BeautifulSoup, str]:
         """
         Generator to retrieve increasingly old room transcripts from server
-        and extract the .text component as a BeautifulSoup object, and the
+        and yield a tuple with the contents as a BeautifulSoup object, and the
         URL it was fetched from.
 
         Optionally sleep before fetching an older page; the fallback_sleep
@@ -128,20 +129,21 @@ class Transcript(SloshyClient):
                         except ValueError:
                             userid = 0
 
-                logging.debug("yielding message %r", {"server": server, "room": room, "url": url, "when": datetime.combine(date, time), "user": {"name": username, "id": userid}, "msg": message.find("div", {"class": "content"}).text.strip(), "link": url})
-                yield {
-                    'server': server,
-                    'room': room,
-                    'url': url,
-                    'when': datetime.combine(date, time),
-                    'user': {
-                        'name': username,
-                        'id': userid
-                        },
-                    'msg': message.find(
+                result = {
+                    "server": server,
+                    "room": room,
+                    "url": url,
+                    "when": datetime.combine(date, time),
+                    "user": {
+                        "name": username,
+                        "id": userid
+                    },
+                    "msg": message.find(
                         "div", {"class": "content"}).text.strip(),
-                    'link': url
+                    "link": url
                 }
+                logging.debug("yielding message %r", result)
+                yield result
 
     def check_frozen_or_deleted(self, server: str, room: int) -> bool:
         """
@@ -169,13 +171,21 @@ class Transcript(SloshyClient):
             server: str,
             userlimit: int=1,
             messagelimit: int=1,
-            skip_system_messages: bool=True
-    ):
+            skip_system_messages: bool=True,
+            sloshy_id: int|None = None,
+            sloshy_interval: timedelta = timedelta(days=7),
+            sloshy_max_interval: timedelta = timedelta(days=15)
+    ) -> list[dict] | None:
         """
         Fetch latest messages from room on server. Stop when the unique
         user count reaches the limit, though always return at least as
         many messages as specified by messagelimit, if available.
-        Optionally, skip system messages (where the user id < 0).
+        Optionally, skip system messages (where the user id < 0);
+        if sloshy_id is not None, it should be the id of the Sloshy user
+        as an int; and then, the fetch is considered successful if two
+        adjacent messages from this user are found with at least the amount
+        of time between them indicated by sloshy_interval (default 7 days),
+        but less than sloshy_max_interval (default 15 days).
 
         Return the sequence of messages as a list of dicts, newest first,
         each as described in the `messages` method's docstring; or, if
@@ -186,13 +196,36 @@ class Transcript(SloshyClient):
 
         self.check_frozen_or_deleted(server, room)
 
-        messages = []
+        messages: list[dict] = []
+        # Logically previous, but chronologically next, as we are traversing
+        # the transcript backwards
+        next_sloshy_msg = None
         users = set()
         for message in self.messages(server, room):
             userid = message['user']['id']
             if userid < 0 and skip_system_messages:
                 continue
+
             messages.append(message)
+
+            if sloshy_id is not None and userid == sloshy_id:
+                if next_sloshy_msg is not None:
+                    sloshy_delta = next_sloshy_msg["when"] - message["when"]
+                    logging.debug(
+                        "Next Sloshy message at %s",
+                        next_sloshy_msg["when"])
+                    logging.debug(
+                        "Current Sloshy message at %s", message["when"])
+                    if sloshy_delta > sloshy_interval and \
+                            sloshy_delta < sloshy_max_interval:
+                        logging.info(
+                            "Room %i: %s: delta to next Sloshy message is %s",
+                            room, message["when"], sloshy_delta)
+                        return messages
+                    else:
+                        logging.debug("Delta %s", sloshy_delta)
+                next_sloshy_msg = message
+
             if userid not in users:
                 logging.debug("room %i: found user %i", room, userid)
                 users.add(userid)
@@ -204,20 +237,33 @@ class Transcript(SloshyClient):
             logging.debug(
                 "room %i: users %s, %i/%i messages", room, users,
                 len(messages), messagelimit)
+
         logging.warning(
             "went back to %s, only found %i messages, %i users",
             message["url"], len(messages), len(users))
         return None
 
-    def latest(self, room: int, server: str) -> dict:
+    def latest(
+            self,
+            room: int,
+            server: str,
+            sloshy_id: int|None = None
+    ) -> dict:
         """
         Fetch latest message from room on server. Return a dict like
         the one produced by the `messages` method.
 
+        If sloshy_id is not None, it should be the id of the Sloshy user,
+        and the user id will be passed to self.usercount().
+
         Skip any negative user id:s, as those are feed messages which do
         not count as actual activity.
         """
-        return self.usercount(room, server, userlimit=1, messagelimit=1)[0]
+        kwargs = {"userlimit": 1, "messagelimit": 1}
+        if sloshy_id is not None:
+            logging.debug("latest: room %i; sloshy_id %i", room, sloshy_id)
+            kwargs["sloshy_id"] = sloshy_id
+        return self.usercount(room, server, **kwargs)[0]
 
     def search(
             self, server: str, room: int, user: int, phrase: str
