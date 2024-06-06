@@ -630,7 +630,7 @@ class Sloshy:
         if slow_summary:
             slowest = {room: room.scan_duration() for room in self.rooms}
             for room in sorted(slowest, key=slowest.get, reverse=True)[0:5]:
-                if slowest[room] == timedelta(seconds=0):
+                if slowest[room] <= timedelta(seconds=60):
                     break
                 self.log_notice(
                     'Relatively slow room: %s (%s)' % (
