@@ -597,9 +597,13 @@ class Sloshy:
             self.log_notice(msg)
             quiet = False
             if age <= maxage and age > max_aggressive_age:
+                if room.sloshy_id is None:
+                    logging.warning(
+                        "Room %s (%i) has no Sloshy ID", room.name, room.id)
                 activity = fetcher.usercount(
                     room.id, room.server, userlimit=2,
-                    messagelimit=AGGRESSIVE_MAX_MSG_THRESHOLD)
+                    messagelimit=AGGRESSIVE_MAX_MSG_THRESHOLD,
+                    sloshy_id=room.sloshy_id)
                 quiet = not activity
             if age > maxage or (quiet and age > max_aggressive_age):
                 try:
