@@ -178,9 +178,10 @@ class Room:
         return without ms."""
         if self._scan_start is None or self._scan_end is None:
             return timedelta(0)
-        diff = self._scan_end - self._scan_start
         if no_ms:
-            diff = diff - timedelta(microseconds=diff.milliseconds)
+            diff = td_no_us(self._scan_start, self._scan_end)
+        else:
+            diff = self._scan_end - self._scan_start
         return diff
 
     def set_as_home_room(self):
