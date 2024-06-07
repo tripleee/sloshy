@@ -16,6 +16,19 @@ workflows:
       - nightly:
           context:
           - sloshy
+
+  manual-scan:
+    when:
+        equal: [ api, << pipeline.trigger_source >> ]
+    jobs:
+      - nightly:
+          filters:
+            branches:
+              only:
+                - master
+          context:
+          - sloshy
+
   test-pushed:
     jobs:
       - test-pushed:
