@@ -485,7 +485,7 @@ class Sloshy:
                         '** Error: could not join %s' % room.linked_name)
                     self.log_error(repr(exception))
                     counter['fail'].add(room.log_id)
-                    time.sleep(30)
+                    sleep(30)
                 counter['server'].add(room.server)
                 counter['id'].add(room.log_id)
                 continue
