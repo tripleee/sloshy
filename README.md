@@ -1,16 +1,16 @@
 # Sloshy the Thawman
 
 
-[![CircleCI: Test pushed code][1]][7]
-[![CircleCI status][5]][6]
-[![Healthckecks.io status][4]][8]
+[![Github Actions: Test pushed code][1]][2]
+[![Github Actions: Nightly][3]][4]
+[![Healthckecks.io status][5]][6]
 
   [1]: https://github.com/tripleee/sloshy/actions/workflows/test-pushed.yml/badge.svg
-  [4]: https://healthchecks.io/badge/1c6e4a7e-e3ba-4ea6-bd6a-4a7ba6/Dc19IJOD-2.svg
-  [5]: https://circleci.com/gh/tripleee/sloshy.svg?style=shield
-  [6]: https://app.circleci.com/pipelines/github/tripleee/sloshy
-  [7]: https://github.com/tripleee/sloshy/issues/75
-  [8]: https://ntfy.sh/sloshy-is-alive
+  [2]: https://github.com/tripleee/sloshy/actions/workflows/test-pushed.yml
+  [3]: https://github.com/tripleee/sloshy/actions/workflows/nightly.yml/badge.svg
+  [4]: https://github.com/tripleee/sloshy/actions/workflows/nightly.yml
+  [5]: https://healthchecks.io/badge/1c6e4a7e-e3ba-4ea6-bd6a-4a7ba6/Dc19IJOD-2.svg
+  [6]: https://ntfy.sh/sloshy-is-alive
 
 This is a simple Stack Overflow / Stack Exchange chat bot
 which keeps an eye on a selected list of rooms,
@@ -67,16 +67,16 @@ you want to add;
   followed by the network account id in round parentheses.
   The network id number can be found by clicking "Network profile"
   on any profile page for your account.
-  (For example, Sloshy is [user 16115299 on Stack Overflow][2],
-  but [network user 21818820][3].)
+  (For example, Sloshy is [user 16115299 on Stack Overflow][7],
+  but [network user 21818820][8].)
 * The `id` is the room's numeric identifier.
   This (together with the server's name) is the way Sloshy finds the room.
 * The `name` field is just a display string for Sloshy's status messages.
   It can be anything, but should describe the room
   reasonably unambiguously to humans.
 
- [2]: https://chat.stackoverflow.com/users/16115299/sloshy
- [3]: https://stackexchange.com/users/21818820/sloshy
+ [7]: https://chat.stackoverflow.com/users/16115299/sloshy
+ [8]: https://stackexchange.com/users/21818820/sloshy
 
 In brief, if your chatroom's URL is
 https://chat.stackexchange.com/rooms/12345/my-room,
