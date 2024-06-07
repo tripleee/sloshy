@@ -485,6 +485,7 @@ class Sloshy:
                         '** Error: could not join %s' % room.linked_name)
                     self.log_error(repr(exception))
                     counter['fail'].add(room.log_id)
+                    time.sleep(30)
                 counter['server'].add(room.server)
                 counter['id'].add(room.log_id)
                 continue
@@ -502,6 +503,12 @@ class Sloshy:
                         % room.linked_name)
                     self.log_error(repr(exception))
                     counter['fail'].add(room.log_id)
+                    if '429' in str(exception):
+                        logging.info('Sleeping 120s after 429 errors')
+                        sleep(120)
+                    else:
+                        logging.info('Sleeping 30s after error')
+                        sleep(30)
                     break
                 if found:
                     logging.info('Found: %s', found)
@@ -583,6 +590,12 @@ class Sloshy:
                     '** Error: could not fetch transcript for %s'
                     % room.linked_name)
                 self.log_error(repr(exception))
+                if '429' in str(exception):
+                    logging.info('Sleeping 120s after 429 errors')
+                    sleep(120)
+                else:
+                    logging.info('Sleeping 30s after error')
+                    sleep(30)
                 failures.add(room.log_id)
                 continue
             if room_latest:
