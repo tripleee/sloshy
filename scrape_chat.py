@@ -10,6 +10,7 @@ import logging
 from typing import Optional, Union
 
 import requests
+from requests.adapters import HTTPAdapter, Retry
 from bs4 import BeautifulSoup
 
 
@@ -29,7 +30,19 @@ class TranscriptFrozenDeletedException(TranscriptException):
 
 class SloshyClient:
     def __init__(self):
-        self.UA = "SloshyBot/0.1 (+%s) Python/%s Requests/%s" % (
+        session = requests.Session()
+        session.headers['User-Agent'] = self._get_ua()
+        session.mount(
+            "https://", HTTPAdapter(
+                max_retries=Retry(
+                    total=5,
+                    backoff_factor=1,
+                    status_forcelist=[429])))
+        self.session = session
+        
+    def _get_ua(self):
+        "Put this in a separate method so that subclasses can easily override"
+        return "SloshyBot/0.1 (+%s) Python/%s Requests/%s" % (
             "https://github.com/tripleee/sloshy",
             platform.python_version(),
             requests.__version__)
@@ -38,8 +51,10 @@ class SloshyClient:
         """
         Simple wrapper to set the User-Agent: correctly and fetch a page,
         then return the BeautifulSoup parse of the result.
+
+        In the case of a 429 error, sleep for a bit and try again.
         """
-        result = requests.get(url, headers={'User-Agent': self.UA})
+        result = self.session.get(url)
         result.raise_for_status()
         return BeautifulSoup(result.text, 'html.parser')
 
