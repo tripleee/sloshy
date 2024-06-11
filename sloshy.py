@@ -798,11 +798,13 @@ def main():
 
     args = parser.parse_args()
 
-    logging.basicConfig(level={
-        "debug": logging.DEBUG,
-        "info": logging.INFO,
-        "warn": logging.WARNING,
-        "error": logging.ERROR
+    logging.basicConfig(
+        format='%(module)s:%(asctime)s:%(levelname)s:%(message)s',
+        level={
+            "debug": logging.DEBUG,
+            "info": logging.INFO,
+            "warn": logging.WARNING,
+            "error": logging.ERROR
         }[args.loglevel])
 
     if args.migrate:
