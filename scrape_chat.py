@@ -240,6 +240,8 @@ class Transcript(SloshyClient):
                     else:
                         logging.debug("Delta %s", sloshy_delta)
                 next_sloshy_msg = message
+            else:
+                next_sloshy_msg = None
 
             if userid not in users:
                 logging.debug("room %i: found user %i", room, userid)
