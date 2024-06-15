@@ -14,6 +14,10 @@ from requests.adapters import HTTPAdapter, Retry
 from bs4 import BeautifulSoup
 
 
+# For debugging issue #103
+requests.packages.urllib3.add_stderr_logger()
+
+
 class TranscriptException(Exception):
     """
     Base class for transcript errors
