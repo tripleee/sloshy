@@ -131,8 +131,8 @@ class Transcript(SloshyClient):
 
             for message in reversed(monologue):
                 when = message.find("div", {"class": "timestamp"})
+                time = None
                 if when:
-                    time = None
                     try:
                         time = datetime.strptime(when.text, "%I:%M %p").time()
                     except ValueError:
