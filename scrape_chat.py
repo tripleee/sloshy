@@ -115,8 +115,13 @@ class Transcript(SloshyClient):
             assert ' - ' in title
             # Title sometimes contains ' (page 1 of 2)' after date
             title = title.split(' (page ')[0]
-            datestr = title.rsplit(' - ', 1)[-1]
-            date = datetime.strptime(datestr, '%Y-%m-%d')
+            datestr = title.rsplit(' - ', 1)[-1].strip()
+            date = None
+            try:
+                date = datetime.strptime(datestr, '%Y-%m-%d')
+            except ValueError:
+                logging.warning("Failed to parse date %r", datestr)
+                raise
 
             monologue = soup.body.find_all("div", {"class": "monologue"})
             if not monologue:
