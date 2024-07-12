@@ -127,8 +127,12 @@ class Transcript(SloshyClient):
             for message in reversed(monologue):
                 when = message.find("div", {"class": "timestamp"})
                 if when:
-                    time = datetime.strptime(when.text, "%I:%M %p").time()
-                else:
+                    time = None
+                    try:
+                        time = datetime.strptime(when.text, "%I:%M %p").time()
+                    except ValueError:
+                        logging.warning("Failed to parse time %r", when.text)
+                if time is None:
                     time = datetime(1970, 1, 1).time()
 
                 userdiv = message.find("div", {"class": "username"})
