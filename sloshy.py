@@ -504,8 +504,8 @@ class Sloshy:
                     self.log_error(repr(exception))
                     counter['fail'].add(room.log_id)
                     if '429' in str(exception):
-                        logging.info('Sleeping 120s after 429 errors')
-                        sleep(120)
+                        logging.info('Sleeping 600s after 429 errors')
+                        sleep(600)
                     else:
                         logging.info('Sleeping 30s after error')
                         sleep(30)
