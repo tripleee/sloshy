@@ -26,4 +26,4 @@ if __name__ == '__main__':
     sloshy = Sloshy(
         "sloshy.yaml", verbose=verbose, location_extra=location_extra)
     sloshy.test_rooms()
-    sloshy.perform_scan("nightly run")
+    sloshy.perform_scan("nightly run", randomize=True)
