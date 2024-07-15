@@ -448,7 +448,7 @@ class Sloshy:
     log_error = lambda self, x, cc=False: self.log_notice(
             x, log_emit=logging.error, cc=True)
 
-    def test_rooms(self, announce=None):
+    def test_rooms(self, announce: None|str = None, randomize: bool = False):
         """
         Test write access in all the rooms in the configuration.
 
@@ -458,11 +458,15 @@ class Sloshy:
         Otherwise, check if Sloshy has already has posted a message to
         each room in turn; if we have, regard it as tested. If not,
         attempt to write the announcement message to the room in question.
+
+        If randomize = True, randomize the order of servers and rooms.
         """
         start_time = datetime.now()
         fetcher = Transcript()
         counter = {'server': set(), 'id': set(), 'fail': set()}
         self.startup_notice(self.homeroom, announce or "room test")
+        if randomize:
+            random.shuffle(self.rooms)
         for room in self.rooms:
             sloshy_id = room.get_sloshy_id()
             if announce is None:
@@ -541,7 +545,11 @@ class Sloshy:
         if len(counter['fail']) > 0:
             raise ValueError('failed to process rooms %s' % counter['fail'])
 
-    def scan_rooms(self, startup_message=None, slow_summary=True):
+    def scan_rooms(
+            self,
+            startup_message: None|str = None,
+            slow_summary: bool = True,
+            randomize: bool = False):
         """
         Main entry point for scanning: Visit room transcripts,
         check if they are in danger of being frozen; if so, join
@@ -552,12 +560,17 @@ class Sloshy:
         If it is empty, missing, or None, it defaults to "manual run".
 
         If slow_summary is not true, skip summarizing the slowest rooms.
+
+        If randomize = True, randomize the order of servers and rooms.
         """
         if not startup_message:
             startup_message = "manual run"
 
         start_time = datetime.now()
         failures = set()
+
+        if randomize:
+            random.shuffle(self.rooms)
 
         # Default freeze schedule is 14 days; thaw a little before that,
         # just to be on the safe side.
@@ -649,14 +662,19 @@ class Sloshy:
                     'Relatively slow room: %s (%s)' % (
                         room.linked_name, room.scan_duration(no_ms=True)))
 
-    def perform_scan(self, startup_message=None, slow_summary=True):
+    def perform_scan(
+            self,
+            startup_message: None|str = None,
+            slow_summary: bool = True,
+            randomize: bool = False
+    ):
         """
         Entry point for a full scan: Perform room scan, then logout().
 
-        startup_message and slow_summary are passed to scan_rooms().
+        startup_message, slow_summary, and randomize are passed to scan_rooms().
         """
         try:
-            self.scan_rooms(startup_message, slow_summary)
+            self.scan_rooms(startup_message, slow_summary, randomize=randomize)
         except Exception as exception:
             raise
         finally:
@@ -776,6 +794,9 @@ def main():
         '--verbose', action='store_true',
         help='Emit room status messages on standard output.')
     parser.add_argument(
+        '--randomize', action='store_true',
+        help='Randomize list of servers and lists of rooms.')
+    parser.add_argument(
         '--loglevel', default='info',
         help='Logging level: debug, info (default), warning, error')
     parser.add_argument(
@@ -826,9 +847,12 @@ def main():
             raise ValueError(
                 '--no-slow-summary is incompatible with --announce '
                 'and --test-rooms')
-        me.test_rooms(args.announce)
+        me.test_rooms(args.announce, randomize=args.randomize)
     else:
-        me.perform_scan(args.startup_message, not args.no_slow_summary)
+        me.perform_scan(
+            args.startup_message,
+            not args.no_slow_summary,
+            randomize=args.randomize)
 
 
 if __name__ == '__main__':
