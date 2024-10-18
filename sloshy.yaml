@@ -135,6 +135,9 @@ servers:
     - contact: tripleee (468289)
       id: 147825
       name: 'The Garbage Disposal (standing in for Toasty)'
+    - contact: galacticninja (495159)
+      id: 147847
+      name: 'Web Apps SE moderator discussion'
     sloshy_id: 514718
   chat.stackoverflow.com:
     rooms:
